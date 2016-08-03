@@ -36,6 +36,10 @@
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     [containerView addSubview:toViewController.view];
     
+    UIView *substituteView = [UIView new];
+    substituteView.backgroundColor = [UIColor whiteColor];
+    [containerView addSubview:substituteView];
+    
     UIView *markView = [[UIView alloc] initWithFrame:containerView.bounds];
     markView.backgroundColor = [UIColor blackColor];
     markView.alpha = 1;
@@ -43,6 +47,7 @@
     
     JOAlbumBrowserViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     CGRect pictureFrame = [self.pictureFrames[fromViewController.currentIndex] CGRectValue];
+    substituteView.frame = pictureFrame;
     UIImageView *imageView = fromViewController.currentImageView;
     
     UIImageView *snapshotView = [UIImageView new];
@@ -58,6 +63,7 @@
     } completion:^(BOOL finished) {
         [markView removeFromSuperview];
         [snapshotView removeFromSuperview];
+        [substituteView removeFromSuperview];
         [transitionContext completeTransition:YES];
     }];
 }
