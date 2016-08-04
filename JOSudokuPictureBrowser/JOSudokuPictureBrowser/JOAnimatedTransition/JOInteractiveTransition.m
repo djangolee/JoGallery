@@ -36,7 +36,7 @@
             [self beganHandle];
             break;
         case UIGestureRecognizerStateChanged: {
-            self.maskView.alpha = 1 - fabs(fraction) * 0.2;
+            self.maskView.alpha = 1 - fabs(fraction) * 0.4;
             CGPoint center = self.snapshotView.center;
             center.y = CGRectGetHeight(self.fromView.frame) / 2 + translation.y;
             self.snapshotView.center = center;

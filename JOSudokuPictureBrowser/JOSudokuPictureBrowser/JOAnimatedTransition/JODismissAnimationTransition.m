@@ -48,6 +48,8 @@
     JOAlbumBrowserViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     CGRect pictureFrame = [self.pictureFrames[fromViewController.currentIndex] CGRectValue];
     substituteView.frame = pictureFrame;
+    substituteView.bounds = CGRectMake(0, 0, CGRectGetWidth(pictureFrame) + 1, CGRectGetHeight(pictureFrame) + 1);
+    
     UIImageView *imageView = fromViewController.currentImageView;
     
     UIImageView *snapshotView = [UIImageView new];

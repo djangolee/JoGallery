@@ -36,7 +36,9 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
     self.albumSouce = models;
     for (JOPictureSouceModel *model in self.albumSouce) {
         NSUInteger index = [self.albumSouce indexOfObject:model];
-        [self.pictureImageViews[index] yy_setImageWithURL:[NSURL URLWithString:model.img_300] placeholder:[UIImage imageNamed:JOSudokuPicturePlaceholderImageName]];
+        BOOL fullimageDowned = [[YYImageCache sharedCache] containsImageForKey:model.origin];
+        NSURL *url = [NSURL URLWithString:fullimageDowned ? model.origin : model.img_300];
+        [self.pictureImageViews[index] yy_setImageWithURL:url placeholder:[UIImage imageNamed:JOSudokuPicturePlaceholderImageName]];
     }
 }
 
@@ -167,7 +169,7 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
     viewController.transitioningDelegate = self.animatedTransition;
     [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:viewController animated:YES completion:nil];
     [self.animatedTransition setPictureImageViewsFrame:[self pictureFrames]];
-    [self.animatedTransition setPresentFromWithView:recognizer.view];
+    [self.animatedTransition setPresentFromWithView:(UIImageView *)recognizer.view];
     [self.animatedTransition setViewController:viewController fromWindow:[[UIApplication sharedApplication].keyWindow snapshotViewAfterScreenUpdates:NO]];
 }
 

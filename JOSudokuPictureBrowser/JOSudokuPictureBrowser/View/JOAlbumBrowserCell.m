@@ -59,36 +59,34 @@
                                        
         if (!error && image) {
             self.pictureImageView.image = image;
-            CGSize imageSize = [self imageSizeToFit:image];
+            CGSize imageSize = [[self class] imageSizeToFit:image];
             CGPoint center = self.pictureImageView.center;
-            [UIView animateWithDuration:0.5 delay:0.5 options:kNilOptions animations:^{
-                self.pictureImageView.bounds = CGRectMake(0, 0, imageSize.width, imageSize.height);
-                self.pictureImageView.center = center;
-            } completion:^(BOOL finished) {
-                if (progress) {
+            if (progress) {
+                [UIView animateWithDuration:0.35 animations:^{
+                    self.pictureImageView.bounds = CGRectMake(0, 0, imageSize.width, imageSize.height);
+                    self.pictureImageView.center = center;
+                } completion:^(BOOL finished) {
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                         self.fullPictureButton.hidden = YES;
                         self.fullPictureButton.enabled = YES;
                     });
-                }
-            }];
+                }];
+            } else {
+                self.pictureImageView.bounds = CGRectMake(0, 0, imageSize.width, imageSize.height);
+                self.pictureImageView.center = center;
+            }
         }
     }];
 }
 
-- (BOOL)visible {
-    CGRect towindowFrame = [self convertRect:self.bounds toView:[UIApplication sharedApplication].keyWindow];
-    return CGRectContainsRect(towindowFrame, [UIApplication sharedApplication].keyWindow.frame);
-}
-
-
-- (CGSize)imageSizeToFit:(UIImage *)image {
++ (CGSize)imageSizeToFit:(UIImage *)image {
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
     CGFloat scale = image.size.width / image.size.height;
-    if (image.size.width > CGRectGetWidth(self.frame) || image.size.height > CGRectGetHeight(self.frame)) {
+    if (image.size.width > screenSize.width || image.size.height > screenSize.height) {
         if (image.size.width > image.size.height) {
-            return CGSizeMake(CGRectGetWidth(self.frame), CGRectGetWidth(self.frame) / scale);
+            return CGSizeMake(screenSize.width, screenSize.width / scale);
         } else {
-            return CGSizeMake(CGRectGetHeight(self.frame) * scale, CGRectGetHeight(self.frame));
+            return CGSizeMake(screenSize.height * scale, screenSize.height);
         }
     } else {
         return image.size;

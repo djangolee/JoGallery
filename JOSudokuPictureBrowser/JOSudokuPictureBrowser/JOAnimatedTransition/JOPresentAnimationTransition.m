@@ -7,6 +7,7 @@
 //
 
 #import "JOPresentAnimationTransition.h"
+#import "JOAlbumBrowserCell.h"
 
 @interface JOPresentAnimationTransition ()
 
@@ -46,27 +47,31 @@
     markView.alpha = 0;
     [containerView addSubview:markView];
     
-    UIView *snapshotView = [self.transitionView snapshotViewAfterScreenUpdates:NO];
+    UIImageView *transitionImageView = [UIImageView new];
+    transitionImageView.clipsToBounds = YES;
+    transitionImageView.image = self.transitionView.image;
+    transitionImageView.contentMode = UIViewContentModeScaleAspectFill;
     CGRect fromRect = [self.transitionView convertRect:self.transitionView.bounds toView:[UIApplication sharedApplication].keyWindow];
-    CGRect transitionBounds = CGRectMake(0, 0, CGRectGetWidth(containerView.frame), CGRectGetWidth(containerView.frame));
+    CGSize transitionSize = [JOAlbumBrowserCell imageSizeToFit:transitionImageView.image];
+    CGRect transitionBounds = CGRectMake(0, 0, transitionSize.width, transitionSize.height);
     CGPoint transtionCenter = CGPointMake(CGRectGetWidth(containerView.frame) / 2, CGRectGetHeight(containerView.frame) / 2);
-    snapshotView.frame = fromRect;
-    substituteView.frame = fromRect;
-    [containerView addSubview:snapshotView];
+    transitionImageView.frame = fromRect;
+    substituteView.frame = CGRectMake(0, 0, CGRectGetWidth(fromRect) + 1, CGRectGetHeight(fromRect) + 1);
+    substituteView.center = transitionImageView.center;
+    [containerView addSubview:transitionImageView];
     
     [UIView animateWithDuration:self.duration animations:^{
         markView.alpha = 1;
-    }];
-    [UIView animateWithDuration:self.duration delay:0 usingSpringWithDamping:0.6 initialSpringVelocity:0 options:UIViewAnimationOptionCurveLinear animations:^{
-        snapshotView.bounds = transitionBounds;
-        snapshotView.center = transtionCenter;
+        transitionImageView.bounds = transitionBounds;
+        transitionImageView.center = transtionCenter;
     } completion:^(BOOL finished) {
         [markView removeFromSuperview];
-        [snapshotView removeFromSuperview];
+        [transitionImageView removeFromSuperview];
         [substituteView removeFromSuperview];
         [containerView addSubview:toViewController.view];
         [transitionContext completeTransition:YES];
-    }];
+        
+    } ];
 }
 
 @end
