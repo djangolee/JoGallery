@@ -10,7 +10,7 @@
 
 @interface JOPresentAnimationTransition : NSObject <UIViewControllerAnimatedTransitioning>
 
-@property (nonatomic, weak) UIView *transitionView;
+@property (nonatomic, weak) UIImageView *transitionView;
 
 - (instancetype)initWithDuration:(NSTimeInterval)duration;
 

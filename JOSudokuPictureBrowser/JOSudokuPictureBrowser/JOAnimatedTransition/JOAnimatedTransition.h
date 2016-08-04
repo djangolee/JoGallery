@@ -11,7 +11,7 @@
 @interface JOAnimatedTransition : NSObject <UIViewControllerTransitioningDelegate>
 
 #pragma mark - Present
-- (void)setPresentFromWithView:(UIView *)view;
+- (void)setPresentFromWithView:(UIImageView *)view;
 
 #pragma mark - Dismiss
 - (void)setPictureImageViewsFrame:(NSArray *)frames;

@@ -421,10 +421,12 @@
 			baseConfigurationReference = 4452D93BDA985C1BCEF88C79 /* Pods-JOSudokuPictureBrowser.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Xiamen Cheye Network Technology Co., Ltd. (386ZJY65M6)";
 				INFOPLIST_FILE = JOSudokuPictureBrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.django.JOSudokuPictureBrowser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "6cc630bf-33d7-4d2f-a3fe-166d3fe9d812";
 			};
 			name = Debug;
 		};
@@ -433,10 +435,12 @@
 			baseConfigurationReference = 6005EC0E19A3B6B2C9F06AC2 /* Pods-JOSudokuPictureBrowser.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Xiamen Cheye Network Technology Co., Ltd. (386ZJY65M6)";
 				INFOPLIST_FILE = JOSudokuPictureBrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.django.JOSudokuPictureBrowser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "6cc630bf-33d7-4d2f-a3fe-166d3fe9d812";
 			};
 			name = Release;
 		};

@@ -63,6 +63,7 @@
     self.pageNumLabel.text = [NSString stringWithFormat:@"%ld / %ld", [self.collectionView indexPathsForVisibleItems].firstObject.item + 1, self.albumSouce.count];
 }
 
+
 #pragma mark - Initialize subviews and make subviews for layout
 - (void)setupView {
     [self addSubviews];

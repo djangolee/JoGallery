@@ -24,7 +24,7 @@ static CGFloat const duration = 0.5;
 @implementation JOAnimatedTransition
 
 #pragma mark - Present
-- (void)setPresentFromWithView:(UIView *)view {
+- (void)setPresentFromWithView:(UIImageView *)view {
     self.presentAnimationTransition.transitionView = view;
 }
 

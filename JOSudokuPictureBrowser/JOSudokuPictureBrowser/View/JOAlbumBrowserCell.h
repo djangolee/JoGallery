@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class JOPictureSouceModel;
+@class JOPictureSouceModel, YYAnimatedImageView;
 
 @interface JOAlbumBrowserCell : UICollectionViewCell
 
@@ -16,5 +16,6 @@
 @property (nonatomic, copy) void (^clickBolck)();
 
 - (void)showWithModel:(JOPictureSouceModel *)model;
++ (CGSize)imageSizeToFit:(UIImage *)image;
 
 @end
