@@ -12,6 +12,10 @@
 #import "JOPictureSouceModel.h"
 #import "JOAlbumBrowserViewController.h"
 
+static NSString * const ContentSizeKeyPath = @"contentSize";
+static void * contentSizeKey = &contentSizeKey;
+
+
 @interface JOAlbumBrowserViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, JOImageViewTransformDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
@@ -27,17 +31,33 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupView];
+    [self addObservers];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    [self removeObservers];
 }
 
 - (BOOL)prefersStatusBarHidden {
     return YES;
 }
 
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0] atScrollPosition:(UICollectionViewScrollPositionLeft) animated:NO];
-    self.pageNumLabel.text = [NSString stringWithFormat:@"%ld / %ld", self.currentIndex + 1, self.albumSouce.count];
+- (void)addObservers {
+    [self.collectionView addObserver:self forKeyPath:ContentSizeKeyPath options:NSKeyValueObservingOptionNew context:contentSizeKey];
 }
+
+- (void)removeObservers {
+    [self.collectionView removeObserver:self forKeyPath:ContentSizeKeyPath];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    if (context == contentSizeKey) {
+        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0] atScrollPosition:(UICollectionViewScrollPositionLeft) animated:NO];
+        self.pageNumLabel.text = [NSString stringWithFormat:@"%ld / %ld", self.currentIndex + 1, self.albumSouce.count];
+    }
+}
+
 
 #pragma mark - UICollectionViewDataSource
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {

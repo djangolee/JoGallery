@@ -19,6 +19,7 @@
 @property (nonatomic, strong) JOImageView *pictureImageView;
 @property (nonatomic, strong) UIButton *fullPictureButton;
 @property (nonatomic, strong) JOPictureSouceModel *model;
+@property (nonatomic, strong) YYWebImageOperation *operation;
 
 @end
 
@@ -46,7 +47,8 @@
     NSURL *url = [NSURL URLWithString:model.origin];
     
     self.pictureImageView.image = nil;
-    [[YYWebImageManager sharedManager] requestImageWithURL:url options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+    [self.operation cancel];      
+    self.operation = [[YYWebImageManager sharedManager] requestImageWithURL:url options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) {
         
     } transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
         if (!error && image) {
