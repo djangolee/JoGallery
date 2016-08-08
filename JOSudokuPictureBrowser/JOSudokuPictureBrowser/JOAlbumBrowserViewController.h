@@ -12,8 +12,12 @@
 
 @interface JOAlbumBrowserViewController : UIViewController
 
+@property (nonatomic, strong) UIView *backgroundView;
 @property (nonatomic, strong) NSArray<JOPictureSouceModel *> *albumSouce;
-@property (nonatomic, strong) UIImageView *currentImageView;
+@property (nonatomic, strong) NSArray *imageViewFrames;
+@property (nonatomic, weak) UIImageView *currentImageView;
+@property (nonatomic) CGAffineTransform currentTransform;
+@property (nonatomic) CGRect currentFrame;
 @property (nonatomic) NSUInteger currentIndex;
 
 @end

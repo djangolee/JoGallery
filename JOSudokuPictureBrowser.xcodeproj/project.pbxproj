@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1832F9A36230756F0B323A94 /* libPods-JOSudokuPictureBrowser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 016979A963F0B7A1EAA8C488 /* libPods-JOSudokuPictureBrowser.a */; };
+		D82D38291D583110009AEF88 /* JOImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = D82D38281D583110009AEF88 /* JOImageView.m */; };
 		D8828F041D50489700F84692 /* JOAlbumBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D8828F031D50489700F84692 /* JOAlbumBrowserCell.m */; };
 		D896CCC61D4F966400E9C64F /* JOAlbumBrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D896CCC51D4F966400E9C64F /* JOAlbumBrowserViewController.m */; };
 		D8B029591D4F3EB4009ADC31 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D8B029581D4F3EB4009ADC31 /* main.m */; };
@@ -28,6 +29,8 @@
 		016979A963F0B7A1EAA8C488 /* libPods-JOSudokuPictureBrowser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-JOSudokuPictureBrowser.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4452D93BDA985C1BCEF88C79 /* Pods-JOSudokuPictureBrowser.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JOSudokuPictureBrowser.debug.xcconfig"; path = "Pods/Target Support Files/Pods-JOSudokuPictureBrowser/Pods-JOSudokuPictureBrowser.debug.xcconfig"; sourceTree = "<group>"; };
 		6005EC0E19A3B6B2C9F06AC2 /* Pods-JOSudokuPictureBrowser.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JOSudokuPictureBrowser.release.xcconfig"; path = "Pods/Target Support Files/Pods-JOSudokuPictureBrowser/Pods-JOSudokuPictureBrowser.release.xcconfig"; sourceTree = "<group>"; };
+		D82D38271D583110009AEF88 /* JOImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JOImageView.h; sourceTree = "<group>"; };
+		D82D38281D583110009AEF88 /* JOImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JOImageView.m; sourceTree = "<group>"; };
 		D8828F021D50489700F84692 /* JOAlbumBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JOAlbumBrowserCell.h; sourceTree = "<group>"; };
 		D8828F031D50489700F84692 /* JOAlbumBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JOAlbumBrowserCell.m; sourceTree = "<group>"; };
 		D896CCC41D4F966400E9C64F /* JOAlbumBrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JOAlbumBrowserViewController.h; sourceTree = "<group>"; };
@@ -79,6 +82,8 @@
 		D8828F011D50487700F84692 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				D82D38271D583110009AEF88 /* JOImageView.h */,
+				D82D38281D583110009AEF88 /* JOImageView.m */,
 				D8828F021D50489700F84692 /* JOAlbumBrowserCell.h */,
 				D8828F031D50489700F84692 /* JOAlbumBrowserCell.m */,
 			);
@@ -303,6 +308,7 @@
 				D896CCC61D4F966400E9C64F /* JOAlbumBrowserViewController.m in Sources */,
 				D8B0299A1D4F4178009ADC31 /* JOInteractiveTransition.m in Sources */,
 				D8828F041D50489700F84692 /* JOAlbumBrowserCell.m in Sources */,
+				D82D38291D583110009AEF88 /* JOImageView.m in Sources */,
 				D8B0295F1D4F3EB4009ADC31 /* ViewController.m in Sources */,
 				D8B0295C1D4F3EB4009ADC31 /* AppDelegate.m in Sources */,
 				D8B029591D4F3EB4009ADC31 /* main.m in Sources */,
@@ -421,12 +427,12 @@
 			baseConfigurationReference = 4452D93BDA985C1BCEF88C79 /* Pods-JOSudokuPictureBrowser.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Xiamen Cheye Network Technology Co., Ltd. (386ZJY65M6)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Shaofeng Yan (JZTBFDL2FY)";
 				INFOPLIST_FILE = JOSudokuPictureBrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.django.JOSudokuPictureBrowser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "6cc630bf-33d7-4d2f-a3fe-166d3fe9d812";
+				PROVISIONING_PROFILE = "e96a9457-57e8-4401-80fa-e60c52700bbb";
 			};
 			name = Debug;
 		};
@@ -435,12 +441,12 @@
 			baseConfigurationReference = 6005EC0E19A3B6B2C9F06AC2 /* Pods-JOSudokuPictureBrowser.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Xiamen Cheye Network Technology Co., Ltd. (386ZJY65M6)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Shaofeng Yan (JZTBFDL2FY)";
 				INFOPLIST_FILE = JOSudokuPictureBrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.django.JOSudokuPictureBrowser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "6cc630bf-33d7-4d2f-a3fe-166d3fe9d812";
+				PROVISIONING_PROFILE = "e96a9457-57e8-4401-80fa-e60c52700bbb";
 			};
 			name = Release;
 		};

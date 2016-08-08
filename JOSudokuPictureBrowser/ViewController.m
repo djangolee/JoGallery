@@ -53,16 +53,16 @@
 
 - (NSMutableArray *)array {
     if (!_array) {
-        YYImageCache *cache = [YYWebImageManager sharedManager].cache;
-        [cache.memoryCache removeAllObjects];
-        [cache.diskCache removeAllObjects];
+//        YYImageCache *cache = [YYWebImageManager sharedManager].cache;
+//        [cache.memoryCache removeAllObjects];
+//        [cache.diskCache removeAllObjects];
         
         _array = [NSMutableArray new];
         NSUInteger number = arc4random() % 9 + 1;
         for (NSUInteger index = 0; index < number; index++) {
             JOPictureSouceModel *model = [JOPictureSouceModel new];
-            model.img_300 = @"https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQB73CVKVYnbsjUCYmgXivLjqrdubq_CgQ-IwMfb0ePM67qMoRKpA";
-            model.origin = @"http://xiaomila.cn/uploadfile/2014/1202/20141202111429452.jpg";
+            model.img_300 = @"http://img4.imgtn.bdimg.com/it/u=2412600270,376933699&fm=21&gp=0.jpg";
+            model.origin = @"http://pic25.nipic.com/20121112/5955207_224247025000_2.jpg";
             [_array addObject:model];
         }
     }

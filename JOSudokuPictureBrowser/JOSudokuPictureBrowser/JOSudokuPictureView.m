@@ -36,8 +36,8 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
     self.albumSouce = models;
     for (JOPictureSouceModel *model in self.albumSouce) {
         NSUInteger index = [self.albumSouce indexOfObject:model];
-        BOOL fullimageDowned = [[YYImageCache sharedCache] containsImageForKey:model.origin];
-        NSURL *url = [NSURL URLWithString:fullimageDowned ? model.origin : model.img_300];
+//        BOOL fullimageDowned = [[YYImageCache sharedCache] containsImageForKey:model.origin];
+        NSURL *url = [NSURL URLWithString: model.origin];
         [self.pictureImageViews[index] yy_setImageWithURL:url placeholder:[UIImage imageNamed:JOSudokuPicturePlaceholderImageName]];
     }
 }
@@ -163,14 +163,18 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
 #pragma mark - Touch methods
 - (void)pictureClick:(UITapGestureRecognizer *)recognizer {
     self.animatedTransition = nil;
+    UIView *fromView = [[UIApplication sharedApplication].keyWindow snapshotViewAfterScreenUpdates:NO];
     JOAlbumBrowserViewController *viewController = [JOAlbumBrowserViewController new];
     viewController.albumSouce = self.albumSouce.copy;
     viewController.currentIndex = [self.pictureImageViews indexOfObject:(YYAnimatedImageView *)recognizer.view];
+    viewController.backgroundView = fromView;
+    viewController.imageViewFrames = [self pictureFrames];
     viewController.transitioningDelegate = self.animatedTransition;
     [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:viewController animated:YES completion:nil];
-    [self.animatedTransition setPictureImageViewsFrame:[self pictureFrames]];
+    
     [self.animatedTransition setPresentFromWithView:(UIImageView *)recognizer.view];
-    [self.animatedTransition setViewController:viewController fromWindow:[[UIApplication sharedApplication].keyWindow snapshotViewAfterScreenUpdates:NO]];
+    [self.animatedTransition setPictureImageViewsFrame:[self pictureFrames]];
+    [self.animatedTransition setViewController:viewController fromWindow:fromView];
 }
 
 #pragma mark - Setter and getter

@@ -34,7 +34,7 @@ static CGFloat const duration = 0.5;
 }
 
 #pragma mark - Interactive
-- (void)setViewController:(UIViewController *)toViewController fromWindow:(UIView *)fromView {
+- (void)setViewController:(JOAlbumBrowserViewController *)toViewController fromWindow:(UIView *)fromView {
     self.interactiveTransition.toViewController = toViewController;
     self.interactiveTransition.fromView = fromView;
 }
