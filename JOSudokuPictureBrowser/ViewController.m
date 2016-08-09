@@ -13,6 +13,7 @@
 #import "YYImageCache.h"
 #import "YYWebImageManager.h"
 #import "YYCache.h"
+#import "Masonry.h"
 
 @interface ViewController ()
 
@@ -28,6 +29,14 @@
     [self setupView];
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    [self.sudokuPictureView mas_updateConstraints:^(MASConstraintMaker *make) {
+        CGFloat height = [JOSudokuPictureView heightWithModels:self.array width:CGRectGetWidth(self.view.frame)];
+        make.height.mas_equalTo(height);
+    }];
+}
+
 #pragma mark - Initialize subviews and make subviews for layout
 
 - (void)setupView {
@@ -40,7 +49,11 @@
 }
 
 - (void)makeSubviewsLayout {
-    self.sudokuPictureView.frame = CGRectMake(0, 64, CGRectGetWidth(self.view.frame), 300);
+    [self.sudokuPictureView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.left.right.equalTo(self.view).insets(UIEdgeInsetsMake(64, 0, 0, 0));
+        CGFloat height = [JOSudokuPictureView heightWithModels:self.array width:CGRectGetWidth(self.view.frame)];
+        make.height.mas_equalTo(height);
+    }];
 }
 
 #pragma mark - Setter and getter
@@ -63,8 +76,8 @@
         NSUInteger number = arc4random() % 9 + 1;
         for (NSUInteger index = 0; index < number; index++) {
             JOPictureSouceModel *model = [JOPictureSouceModel new];
-            model.img_300 = @"http://img22.mtime.cn/up/2010/06/08/113030.87522850_500.jpg";
-            model.origin = @"http://www.cx8888.cn/tk/tksheying/tksheying3/tksheying3_2/tksheying3_2016.jpg";
+            model.img_300 = @"https://avatars2.githubusercontent.com/u/17513630?v=3&s=40";
+            model.origin = @"https://avatars0.githubusercontent.com/u/17513630?v=3&s=460";
             [_array addObject:model];
         }
     }

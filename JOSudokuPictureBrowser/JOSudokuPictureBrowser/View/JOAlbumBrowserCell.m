@@ -39,7 +39,6 @@
 
 - (void)showWithModel:(JOPictureSouceModel *)model {
     self.model = model;
-    
     BOOL fullimageDowned = [[YYImageCache sharedCache] containsImageForKey:model.origin];
     self.fullPictureButton.hidden = fullimageDowned;
     if (!fullimageDowned) {
