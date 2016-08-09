@@ -6,6 +6,7 @@
 //  Copyright © 2016 django. All rights reserved.
 //
 
+#import "JOImageView.h"
 #import "JODismissAnimationTransition.h"
 #import "JOAlbumBrowserViewController.h"
 
@@ -18,6 +19,7 @@
 @implementation JODismissAnimationTransition
 
 #pragma mark - Lief cycle
+
 - (instancetype)initWithDuration:(NSTimeInterval)duration {
     self = [super init];
     if (self) {
@@ -27,6 +29,7 @@
 }
 
 #pragma mark - UIViewControllerAnimatedTransitioning
+
 - (NSTimeInterval)transitionDuration:(nullable id <UIViewControllerContextTransitioning>)transitionContext {
     return self.duration;
 }
@@ -40,32 +43,33 @@
     substituteView.backgroundColor = [UIColor whiteColor];
     [containerView addSubview:substituteView];
     
-    UIView *markView = [[UIView alloc] initWithFrame:containerView.bounds];
-    markView.backgroundColor = [UIColor blackColor];
-    markView.alpha = 1;
-    [containerView addSubview:markView];
+    UIView *maskView = [[UIView alloc] initWithFrame:containerView.bounds];
+    maskView.backgroundColor = [UIColor blackColor];
+    [containerView addSubview:maskView];
     
     JOAlbumBrowserViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    CGRect pictureFrame = [self.pictureFrames[fromViewController.currentIndex] CGRectValue];
-    substituteView.frame = pictureFrame;
-    substituteView.bounds = CGRectMake(0, 0, CGRectGetWidth(pictureFrame) + 1, CGRectGetHeight(pictureFrame) + 1);
+    CGRect toFrame = [self.pictureFrames[fromViewController.currentIndex] CGRectValue];
+    CGRect fromFrame = fromViewController.currentFrame;
+    CGAffineTransform transform = fromViewController.currentTransform;
     
-    UIImageView *imageView = fromViewController.currentImageView;
+    substituteView.frame = toFrame;
+    maskView.alpha = sqrt(transform.a * transform.a + transform.c * transform.c);
     
-    UIImageView *snapshotView = [UIImageView new];
-    snapshotView.clipsToBounds = YES;
-    snapshotView.contentMode = UIViewContentModeScaleAspectFill;
-    snapshotView.image = imageView.image;
-    snapshotView.frame = [imageView convertRect:imageView.bounds toView:[UIApplication sharedApplication].keyWindow];
-    [containerView addSubview:snapshotView];
+    UIView *imageView = [[UIImageView alloc] initWithImage:fromViewController.currentImageView.image];
+    imageView.clipsToBounds = YES;
+    imageView.frame = fromFrame;
+    imageView.transform = transform;
+    imageView.contentMode = UIViewContentModeScaleAspectFill;
+    [containerView addSubview:imageView];
     
-    [UIView animateWithDuration:self.duration animations:^{
-        snapshotView.frame = pictureFrame;
-        markView.alpha = 0;
+    [UIView animateWithDuration:self.duration / 2 animations:^{
+        imageView.transform = CGAffineTransformMake(1, 0, 0, 1, 0, 0);
+        maskView.alpha = 0;
+        imageView.frame = toFrame;
     } completion:^(BOOL finished) {
-        [markView removeFromSuperview];
-        [snapshotView removeFromSuperview];
+        [maskView removeFromSuperview];
         [substituteView removeFromSuperview];
+        [imageView removeFromSuperview];
         [transitionContext completeTransition:YES];
     }];
 }

@@ -7,19 +7,20 @@
 //
 
 #import "JOInteractiveTransition.h"
-#import "JOAlbumBrowserViewController.h"
 
 @interface JOInteractiveTransition ()
 
 @property (nonatomic, strong) UIView *maskView;
-@property (nonatomic, strong) UIView *snapshotView;
-@property (nonatomic) BOOL shouldComplete;
+@property (nonatomic, strong) UIView *substituteView;
+@property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic) CGPoint imageViewCenter;
 
 @end
 
 @implementation JOInteractiveTransition
 
 #pragma mark - Private methods
+
 - (void)addPanGestureForViewController:(UIViewController *)viewController{
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
     [viewController.view addGestureRecognizer:pan];
@@ -28,7 +29,8 @@
 
 - (void)handleGesture:(UIPanGestureRecognizer *)gestureRecognizer {
     CGPoint translation = [gestureRecognizer translationInView:gestureRecognizer.view];
-    CGFloat fraction = translation.y / CGRectGetHeight(gestureRecognizer.view.frame);
+    CGFloat scale = 1 - fabs(translation.y / (CGRectGetHeight(self.toViewController.view.frame)));
+    scale = scale < 0 ? 0 : scale;
     switch (gestureRecognizer.state) {
         case UIGestureRecognizerStatePossible:
             break;
@@ -36,16 +38,15 @@
             [self beganHandle];
             break;
         case UIGestureRecognizerStateChanged: {
-            self.maskView.alpha = 1 - fabs(fraction) * 0.4;
-            CGPoint center = self.snapshotView.center;
-            center.y = CGRectGetHeight(self.fromView.frame) / 2 + translation.y;
-            self.snapshotView.center = center;
+            self.imageView.center = CGPointMake(self.imageViewCenter.x + translation.x * scale, self.imageViewCenter.y + translation.y);
+            self.maskView.alpha = scale;
+            self.imageView.transform = CGAffineTransformMakeScale(scale, scale);
             break;
         }
         case UIGestureRecognizerStateFailed:
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateEnded: {
-            [self endHandle:fabs(fraction) > 0.5];
+            [self endHandle:scale < 0.9];
         }
     }
 }
@@ -53,11 +54,11 @@
 - (void)beganHandle {
     self.fromView.frame = self.toViewController.view.bounds;
     self.maskView.frame = self.fromView.bounds;
-    self.maskView.alpha = 1;
-    UIView *tempView = ((JOAlbumBrowserViewController *)self.toViewController).currentImageView;
-    self.snapshotView = [tempView snapshotViewAfterScreenUpdates:NO];
-    self.snapshotView.frame = [tempView convertRect:tempView.bounds toView:[UIApplication sharedApplication].keyWindow];
-    [self.fromView addSubview:self.snapshotView];
+    self.substituteView.frame = [self.toViewController.imageViewFrames[self.toViewController.currentIndex] CGRectValue];
+    self.imageView.frame = [self.toViewController.currentImageView convertRect:self.toViewController.currentImageView.bounds toView:self.toViewController.view];
+    self.imageViewCenter = self.imageView.center;
+    self.imageView.image = self.toViewController.currentImageView.image;
+    
     [self.toViewController.view addSubview:self.fromView];
 }
 
@@ -65,52 +66,64 @@
     if (dismiss) {
         [UIView animateWithDuration:0.25 animations:^{
             self.maskView.alpha = 0;
-            CGPoint center = self.snapshotView.center;
-            center.y = center.y > (CGRectGetHeight(self.toViewController.view.frame) / 2) ? CGRectGetHeight(self.toViewController.view.frame) * 2 : -CGRectGetHeight(self.toViewController.view.frame);
-            self.snapshotView.center = center;
+            self.imageView.frame = self.substituteView.frame;
         } completion:^(BOOL finished) {
             [[UIApplication sharedApplication].keyWindow addSubview:self.fromView];
             [self.toViewController dismissViewControllerAnimated:NO completion:nil];
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self.fromView removeFromSuperview];
-                [self.snapshotView removeFromSuperview];
-                self.snapshotView = nil;
+                self.fromView = nil;
             });
         }];
     } else {
         [UIView animateWithDuration:0.25 animations:^{
             self.maskView.alpha = 1;
-            CGPoint center = self.snapshotView.center;
-            center.y = CGRectGetHeight(self.fromView.frame) / 2;
-            self.snapshotView.center = center;
+            self.imageView.center = self.imageViewCenter;
+            self.imageView.transform = CGAffineTransformMake(1, 0, 0, 1, 0, 0);
         } completion:^(BOOL finished) {
+            self.toViewController.currentImageView = nil;
             [self.fromView removeFromSuperview];
-            [self.snapshotView removeFromSuperview];
-            self.snapshotView = nil;
         }];
     }
 }
 
-
 #pragma mark - Setter and getter
-- (void)setToViewController:(UIViewController *)toViewController {
+
+- (void)setToViewController:(JOAlbumBrowserViewController *)toViewController {
     _toViewController = toViewController;
     [self addPanGestureForViewController:toViewController];
+}
+
+- (void)setFromView:(UIView *)fromView {
+    _fromView = [fromView snapshotViewAfterScreenUpdates:NO];
+    [_fromView addSubview:self.substituteView];
+    [_fromView addSubview:self.maskView];
+    [_fromView addSubview:self.imageView];
 }
 
 - (UIView *)maskView {
     if (!_maskView) {
         _maskView = [UIView new];
+        _maskView.backgroundColor = [UIColor blackColor];
     }
     return _maskView;
 }
 
-- (void)setFromView:(UIView *)fromView {
-    self.maskView.bounds = fromView.frame;
-     self.maskView.backgroundColor = [UIColor blackColor];
-    [fromView addSubview:self.maskView];
-    _fromView = fromView;
+- (UIView *)substituteView {
+    if (!_substituteView) {
+        _substituteView = [UIView new];
+        _substituteView.backgroundColor = [UIColor whiteColor];
+    }
+    return _substituteView;
 }
 
+- (UIImageView *)imageView {
+    if (!_imageView) {
+        _imageView = [UIImageView new];
+        _imageView.clipsToBounds = YES;
+        _imageView.contentMode = UIViewContentModeScaleAspectFill;
+    }
+    return _imageView;
+}
 
 @end

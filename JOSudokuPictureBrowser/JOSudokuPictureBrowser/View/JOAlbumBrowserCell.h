@@ -7,15 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "JOImageView.h"
 
-@class JOPictureSouceModel, YYAnimatedImageView;
+@class JOPictureSouceModel;
 
 @interface JOAlbumBrowserCell : UICollectionViewCell
 
-@property (nonatomic, strong) YYAnimatedImageView *pictureImageView;
-@property (nonatomic, copy) void (^clickBolck)();
+@property (nonatomic, strong) UIImageView *imageView;
 
+- (void)setImageViewDelegate:(id <JOImageViewTransformDelegate>)delegate;
 - (void)showWithModel:(JOPictureSouceModel *)model;
-+ (CGSize)imageSizeToFit:(UIImage *)image;
 
 @end

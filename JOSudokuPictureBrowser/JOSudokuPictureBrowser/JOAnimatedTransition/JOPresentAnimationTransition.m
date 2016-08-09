@@ -8,6 +8,7 @@
 
 #import "JOPresentAnimationTransition.h"
 #import "JOAlbumBrowserCell.h"
+#import "JOImageView.h"
 
 @interface JOPresentAnimationTransition ()
 
@@ -18,6 +19,7 @@
 @implementation JOPresentAnimationTransition
 
 #pragma mark - Lief cycle
+
 - (instancetype)initWithDuration:(NSTimeInterval)duration {
     self = [super init];
     if (self) {
@@ -27,51 +29,50 @@
 }
 
 #pragma mark - UIViewControllerAnimatedTransitioning
+
 - (NSTimeInterval)transitionDuration:(nullable id <UIViewControllerContextTransitioning>)transitionContext {
     return self.duration;
 }
 
 - (void)animateTransition:(id <UIViewControllerContextTransitioning>)transitionContext {
     UIView *containerView = [transitionContext containerView];
-    
-    UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-    [containerView addSubview:fromViewController.view];
+    toViewController.view.hidden = YES;
+    [containerView addSubview:toViewController.view];
     
     UIView *substituteView = [UIView new];
     substituteView.backgroundColor = [UIColor whiteColor];
     [containerView addSubview:substituteView];
     
-    UIView *markView = [[UIView alloc] initWithFrame:containerView.bounds];
-    markView.backgroundColor = [UIColor blackColor];
-    markView.alpha = 0;
-    [containerView addSubview:markView];
+    UIView *backgoundView = [[UIView alloc] initWithFrame:containerView.bounds];
+    backgoundView.backgroundColor = [UIColor blackColor];
+    backgoundView.alpha = 0;
+    [containerView addSubview:backgoundView];
     
-    UIImageView *transitionImageView = [UIImageView new];
-    transitionImageView.clipsToBounds = YES;
-    transitionImageView.image = self.transitionView.image;
-    transitionImageView.contentMode = UIViewContentModeScaleAspectFill;
-    CGRect fromRect = [self.transitionView convertRect:self.transitionView.bounds toView:[UIApplication sharedApplication].keyWindow];
-    CGSize transitionSize = [JOAlbumBrowserCell imageSizeToFit:transitionImageView.image];
-    CGRect transitionBounds = CGRectMake(0, 0, transitionSize.width, transitionSize.height);
-    CGPoint transtionCenter = CGPointMake(CGRectGetWidth(containerView.frame) / 2, CGRectGetHeight(containerView.frame) / 2);
-    transitionImageView.frame = fromRect;
-    substituteView.frame = CGRectMake(0, 0, CGRectGetWidth(fromRect) + 1, CGRectGetHeight(fromRect) + 1);
-    substituteView.center = transitionImageView.center;
-    [containerView addSubview:transitionImageView];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:self.transitionView.image];
+    imageView.frame = [self.transitionView convertRect:self.transitionView.bounds toView:containerView];
+    imageView.contentMode = UIViewContentModeScaleAspectFill;
+    [containerView addSubview:imageView];
+    
+    substituteView.frame = imageView.frame;
     
     [UIView animateWithDuration:self.duration animations:^{
-        markView.alpha = 1;
-        transitionImageView.bounds = transitionBounds;
-        transitionImageView.center = transtionCenter;
+        backgoundView.alpha = 1;
     } completion:^(BOOL finished) {
-        [markView removeFromSuperview];
-        [transitionImageView removeFromSuperview];
+        [backgoundView removeFromSuperview];
+    }];
+    
+    [UIView animateWithDuration:self.duration delay:0.0 usingSpringWithDamping:0.6 initialSpringVelocity:0.1 options:UIViewAnimationOptionCurveLinear animations:^{
+        CGSize size = [JOImageView imageSizeToFit:imageView.image];
+        imageView.bounds = CGRectMake(0, 0, size.width, size.height);
+        imageView.center = CGPointMake(CGRectGetWidth(containerView.frame) / 2, CGRectGetHeight(containerView.frame) / 2);
+    } completion:^(BOOL finished) {
+        toViewController.view.hidden = NO;
+        [imageView removeFromSuperview];
         [substituteView removeFromSuperview];
-        [containerView addSubview:toViewController.view];
         [transitionContext completeTransition:YES];
-        
-    } ];
+    }];
+    
 }
 
 @end

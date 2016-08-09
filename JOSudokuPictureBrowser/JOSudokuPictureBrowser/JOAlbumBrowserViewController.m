@@ -12,44 +12,68 @@
 #import "JOPictureSouceModel.h"
 #import "JOAlbumBrowserViewController.h"
 
-@interface JOAlbumBrowserViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
+static NSString * const ContentSizeKeyPath = @"contentSize";
+static void * contentSizeKey = &contentSizeKey;
+
+
+@interface JOAlbumBrowserViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, JOImageViewTransformDelegate>
 
 @property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, strong) UIView *substituteView;
 @property (nonatomic, strong) UILabel *pageNumLabel;
+@property (nonatomic, strong) UIView *maskView;
 
 @end
 
 @implementation JOAlbumBrowserViewController
 
 #pragma mark - Life cycle
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupView];
+    [self addObservers];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    [self removeObservers];
 }
 
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0] atScrollPosition:(UICollectionViewScrollPositionLeft) animated:NO];
-    self.pageNumLabel.text = [NSString stringWithFormat:@"%ld / %ld", self.currentIndex + 1, self.albumSouce.count];
+- (BOOL)prefersStatusBarHidden {
+    return YES;
 }
+
+- (void)addObservers {
+    [self.collectionView addObserver:self forKeyPath:ContentSizeKeyPath options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:contentSizeKey];
+}
+
+- (void)removeObservers {
+    [self.collectionView removeObserver:self forKeyPath:ContentSizeKeyPath];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    if (context == contentSizeKey) {
+        CGSize oldSize = [change[NSKeyValueChangeOldKey] CGSizeValue];
+        CGSize newSize = [change[NSKeyValueChangeNewKey] CGSizeValue];
+        if (!CGSizeEqualToSize(oldSize, newSize)) {
+            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0] atScrollPosition:(UICollectionViewScrollPositionLeft) animated:NO];
+            self.pageNumLabel.text = [NSString stringWithFormat:@"%ld / %ld", self.currentIndex + 1, self.albumSouce.count];
+        }
+    }
+}
+
 
 #pragma mark - UICollectionViewDataSource
+
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return self.albumSouce.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     JOAlbumBrowserCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:NSStringFromClass([JOAlbumBrowserCell class]) forIndexPath:indexPath];
-    __weak __typeof (self) weakSelf = self;
     [cell showWithModel:self.albumSouce[indexPath.item]];
-    cell.clickBolck = ^ {
-        [weakSelf dismissViewControllerAnimated:YES completion:nil];
-    };
+    [cell setImageViewDelegate:self];
     return cell;
 }
 
@@ -58,13 +82,52 @@
 }
 
 #pragma mark - UIScrollViewDelegate
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     self.currentIndex = [self.collectionView indexPathsForVisibleItems].firstObject.item;
     self.pageNumLabel.text = [NSString stringWithFormat:@"%ld / %ld", [self.collectionView indexPathsForVisibleItems].firstObject.item + 1, self.albumSouce.count];
 }
 
+#pragma mark - JOImageViewTransformDelegate
+
+- (void)beganTransformImageView:(UIImageView *)imageView {
+    self.currentImageView = imageView;
+    self.substituteView.frame = [self.imageViewFrames[self.currentIndex] CGRectValue];
+}
+
+- (void)imageView:(UIImageView *)imageview changeTransform:(CGAffineTransform)transform {
+    CGFloat scale = sqrt(transform.a * transform.a + transform.c * transform.c);
+    self.maskView.alpha = scale;
+}
+
+- (void)imageView:(UIImageView *)imageview endTransform:(CGAffineTransform)transform frame:(CGRect)frame {
+    self.currentImageView = imageview;
+    self.currentTransform = transform;
+    self.currentFrame = frame;
+    CGFloat scale = sqrt(transform.a * transform.a + transform.c * transform.c);    
+    if (scale < 0.9) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    } else {
+        self.currentImageView = nil;
+        [UIView animateWithDuration:0.25 animations:^{
+            self.maskView.alpha = 1;
+        }];
+    }
+}
+
+- (void)longPressImageView:(UIImageView *)imageview {
+    NSLog(@"%s", __func__);
+}
+
+- (void)singlePressimageView:(UIImageView *)imageview {
+    [self beganTransformImageView:imageview];
+    self.currentTransform = CGAffineTransformMake(1, 0, 0, 1, 0, 0);
+    self.currentFrame = [imageview convertRect:imageview.bounds toView:self.view];
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 
 #pragma mark - Initialize subviews and make subviews for layout
+
 - (void)setupView {
     [self addSubviews];
     [self makeSubviewsLayout];
@@ -87,6 +150,7 @@
 }
 
 #pragma mark - Setter and getter
+
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
         UICollectionViewFlowLayout *flowLayout = [UICollectionViewFlowLayout new];
@@ -98,6 +162,8 @@
         _collectionView.dataSource = self;
         _collectionView.pagingEnabled = YES;
         _collectionView.showsHorizontalScrollIndicator = NO;
+        _collectionView.backgroundView = nil;
+        _collectionView.backgroundColor = [UIColor clearColor];
         [_collectionView registerClass:[JOAlbumBrowserCell class] forCellWithReuseIdentifier:NSStringFromClass([JOAlbumBrowserCell class])];
     }
     return _collectionView;
@@ -114,11 +180,40 @@
     return _pageNumLabel;
 }
 
-- (UIImageView *)currentImageView {
-    JOAlbumBrowserCell *cell = [self.collectionView visibleCells].firstObject;
-    return cell.pictureImageView;
+- (void)setBackgroundView:(UIView *)backgroundView {
+    if (_backgroundView) {
+        [_backgroundView removeFromSuperview];
+    }
+    backgroundView.frame = self.view.bounds;
+    self.maskView.frame = backgroundView.bounds;
+    [self.view insertSubview:backgroundView atIndex:0];
+    [backgroundView addSubview:self.substituteView];
+    [backgroundView addSubview:self.maskView];
+    
+    _backgroundView = backgroundView;
 }
 
+- (UIView *)maskView {
+    if (!_maskView) {
+        _maskView = [UIView new];
+        _maskView.backgroundColor = [UIColor blackColor];
+    }
+    return _maskView;
+}
 
+- (UIView *)substituteView {
+    if (!_substituteView) {
+        _substituteView = [UIView new];
+        _substituteView.backgroundColor = [UIColor whiteColor];
+    }
+    return _substituteView;
+}
+
+- (UIImageView *)currentImageView {
+    if (!_currentImageView) {
+        _currentImageView = ((JOAlbumBrowserCell *)[self.collectionView visibleCells].firstObject).imageView;
+    }
+    return _currentImageView;
+}
 
 @end

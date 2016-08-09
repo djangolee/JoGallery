@@ -25,6 +25,7 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
 @implementation JOSudokuPictureView
 
 #pragma mark - Over ride
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self jo_sizeToFit];
@@ -32,6 +33,7 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
 }
 
 #pragma mark - Public methods
+
 - (void)showAlbumWithPictures:(NSArray<JOPictureSouceModel *> *)models {
     self.albumSouce = models;
     for (JOPictureSouceModel *model in self.albumSouce) {
@@ -87,6 +89,7 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
 }
 
 #pragma mark - Private methods
+
 - (void)refuelPictureImageView {
     if (self.pictureImageViews.count >= self.albumSouce.count) {
         return;
@@ -161,19 +164,25 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
 }
 
 #pragma mark - Touch methods
+
 - (void)pictureClick:(UITapGestureRecognizer *)recognizer {
     self.animatedTransition = nil;
+    UIView *fromView = [[UIApplication sharedApplication].keyWindow snapshotViewAfterScreenUpdates:NO];
     JOAlbumBrowserViewController *viewController = [JOAlbumBrowserViewController new];
     viewController.albumSouce = self.albumSouce.copy;
     viewController.currentIndex = [self.pictureImageViews indexOfObject:(YYAnimatedImageView *)recognizer.view];
+    viewController.backgroundView = fromView;
+    viewController.imageViewFrames = [self pictureFrames];
     viewController.transitioningDelegate = self.animatedTransition;
     [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:viewController animated:YES completion:nil];
-    [self.animatedTransition setPictureImageViewsFrame:[self pictureFrames]];
+    
     [self.animatedTransition setPresentFromWithView:(UIImageView *)recognizer.view];
-    [self.animatedTransition setViewController:viewController fromWindow:[[UIApplication sharedApplication].keyWindow snapshotViewAfterScreenUpdates:NO]];
+    [self.animatedTransition setPictureImageViewsFrame:[self pictureFrames]];
+    [self.animatedTransition setViewController:viewController fromWindow:fromView];
 }
 
 #pragma mark - Setter and getter
+
 - (NSMutableArray<YYAnimatedImageView *> *)pictureImageViews {
     if (!_pictureImageViews) {
         _pictureImageViews = [[NSMutableArray alloc] initWithCapacity:9];

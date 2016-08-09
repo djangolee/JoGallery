@@ -29,6 +29,7 @@
 }
 
 #pragma mark - Initialize subviews and make subviews for layout
+
 - (void)setupView {
     [self addSubviews];
     [self makeSubviewsLayout];
@@ -43,6 +44,7 @@
 }
 
 #pragma mark - Setter and getter
+
 - (JOSudokuPictureView *)sudokuPictureView {
     if (!_sudokuPictureView) {
         _sudokuPictureView = [JOSudokuPictureView new];
@@ -61,8 +63,8 @@
         NSUInteger number = arc4random() % 9 + 1;
         for (NSUInteger index = 0; index < number; index++) {
             JOPictureSouceModel *model = [JOPictureSouceModel new];
-            model.img_300 = @"https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQB73CVKVYnbsjUCYmgXivLjqrdubq_CgQ-IwMfb0ePM67qMoRKpA";
-            model.origin = @"http://xiaomila.cn/uploadfile/2014/1202/20141202111429452.jpg";
+            model.img_300 = @"http://img22.mtime.cn/up/2010/06/08/113030.87522850_500.jpg";
+            model.origin = @"http://www.cx8888.cn/tk/tksheying/tksheying3/tksheying3_2/tksheying3_2016.jpg";
             [_array addObject:model];
         }
     }
