@@ -44,11 +44,26 @@ static CGFloat const maximumZoomScale = 2.0;
     self.imageView.image = image ? : self.placeholderImage;
     if (CGRectEqualToRect(self.frame, CGRectZero)) return;
     
+    [self imageIfLonglong:self.imageView.image];
     self.scrollView.contentSize = self.frame.size;
     CGSize imageSize = [[self class] imageSizeToFit:self.imageView.image];
     self.imageView.transform = CGAffineTransformMake(1, 0, 0, 1, 0, 0);
     self.imageView.bounds = CGRectMake(0, 0, imageSize.width, imageSize.height);
     self.imageView.center = CGPointMake(CGRectGetWidth(self.frame) / 2, CGRectGetHeight(self.frame) / 2);
+}
+
+- (void)imageIfLonglong:(UIImage *)image {
+    CGSize selfSize = self.frame.size;
+    CGSize imageFitSize = [[self class] imageSizeToFit:image];
+    
+    CGFloat scale = maximumZoomScale;
+    if (imageFitSize.width < selfSize.width) {
+        scale = selfSize.width / imageFitSize.width > scale ? selfSize.width / imageFitSize.width : scale;
+    }
+    if (imageFitSize.height < selfSize.height) {
+        scale = selfSize.height / imageFitSize.height > scale ? selfSize.height / imageFitSize.height : scale;
+    }
+    self.maximumZoomScale = scale;
 }
 
 - (void)setContentMode:(UIViewContentMode)contentMode {
