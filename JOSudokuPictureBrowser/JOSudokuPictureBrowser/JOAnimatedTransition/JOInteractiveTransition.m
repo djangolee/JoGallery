@@ -20,6 +20,7 @@
 @implementation JOInteractiveTransition
 
 #pragma mark - Private methods
+
 - (void)addPanGestureForViewController:(UIViewController *)viewController{
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
     [viewController.view addGestureRecognizer:pan];
@@ -87,6 +88,7 @@
 }
 
 #pragma mark - Setter and getter
+
 - (void)setToViewController:(JOAlbumBrowserViewController *)toViewController {
     _toViewController = toViewController;
     [self addPanGestureForViewController:toViewController];

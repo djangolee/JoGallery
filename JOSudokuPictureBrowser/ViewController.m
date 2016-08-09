@@ -29,6 +29,7 @@
 }
 
 #pragma mark - Initialize subviews and make subviews for layout
+
 - (void)setupView {
     [self addSubviews];
     [self makeSubviewsLayout];
@@ -43,6 +44,7 @@
 }
 
 #pragma mark - Setter and getter
+
 - (JOSudokuPictureView *)sudokuPictureView {
     if (!_sudokuPictureView) {
         _sudokuPictureView = [JOSudokuPictureView new];
@@ -53,16 +55,16 @@
 
 - (NSMutableArray *)array {
     if (!_array) {
-//        YYImageCache *cache = [YYWebImageManager sharedManager].cache;
-//        [cache.memoryCache removeAllObjects];
-//        [cache.diskCache removeAllObjects];
+        YYImageCache *cache = [YYWebImageManager sharedManager].cache;
+        [cache.memoryCache removeAllObjects];
+        [cache.diskCache removeAllObjects];
         
         _array = [NSMutableArray new];
         NSUInteger number = arc4random() % 9 + 1;
         for (NSUInteger index = 0; index < number; index++) {
             JOPictureSouceModel *model = [JOPictureSouceModel new];
-            model.img_300 = @"http://img4.imgtn.bdimg.com/it/u=2412600270,376933699&fm=21&gp=0.jpg";
-            model.origin = @"http://pic25.nipic.com/20121112/5955207_224247025000_2.jpg";
+            model.img_300 = @"http://img22.mtime.cn/up/2010/06/08/113030.87522850_500.jpg";
+            model.origin = @"http://www.cx8888.cn/tk/tksheying/tksheying3/tksheying3_2/tksheying3_2016.jpg";
             [_array addObject:model];
         }
     }

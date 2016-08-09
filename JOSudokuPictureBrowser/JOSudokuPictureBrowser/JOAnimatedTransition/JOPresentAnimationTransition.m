@@ -19,6 +19,7 @@
 @implementation JOPresentAnimationTransition
 
 #pragma mark - Lief cycle
+
 - (instancetype)initWithDuration:(NSTimeInterval)duration {
     self = [super init];
     if (self) {
@@ -28,6 +29,7 @@
 }
 
 #pragma mark - UIViewControllerAnimatedTransitioning
+
 - (NSTimeInterval)transitionDuration:(nullable id <UIViewControllerContextTransitioning>)transitionContext {
     return self.duration;
 }

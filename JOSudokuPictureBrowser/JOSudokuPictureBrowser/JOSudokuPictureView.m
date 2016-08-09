@@ -25,6 +25,7 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
 @implementation JOSudokuPictureView
 
 #pragma mark - Over ride
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self jo_sizeToFit];
@@ -32,12 +33,13 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
 }
 
 #pragma mark - Public methods
+
 - (void)showAlbumWithPictures:(NSArray<JOPictureSouceModel *> *)models {
     self.albumSouce = models;
     for (JOPictureSouceModel *model in self.albumSouce) {
         NSUInteger index = [self.albumSouce indexOfObject:model];
-//        BOOL fullimageDowned = [[YYImageCache sharedCache] containsImageForKey:model.origin];
-        NSURL *url = [NSURL URLWithString: model.origin];
+        BOOL fullimageDowned = [[YYImageCache sharedCache] containsImageForKey:model.origin];
+        NSURL *url = [NSURL URLWithString:fullimageDowned ? model.origin : model.img_300];
         [self.pictureImageViews[index] yy_setImageWithURL:url placeholder:[UIImage imageNamed:JOSudokuPicturePlaceholderImageName]];
     }
 }
@@ -87,6 +89,7 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
 }
 
 #pragma mark - Private methods
+
 - (void)refuelPictureImageView {
     if (self.pictureImageViews.count >= self.albumSouce.count) {
         return;
@@ -161,6 +164,7 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
 }
 
 #pragma mark - Touch methods
+
 - (void)pictureClick:(UITapGestureRecognizer *)recognizer {
     self.animatedTransition = nil;
     UIView *fromView = [[UIApplication sharedApplication].keyWindow snapshotViewAfterScreenUpdates:NO];
@@ -178,6 +182,7 @@ NSString * const JOSudokuPicturePlaceholderImageName = @"default";
 }
 
 #pragma mark - Setter and getter
+
 - (NSMutableArray<YYAnimatedImageView *> *)pictureImageViews {
     if (!_pictureImageViews) {
         _pictureImageViews = [[NSMutableArray alloc] initWithCapacity:9];

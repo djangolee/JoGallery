@@ -13,12 +13,15 @@
 @interface JOAnimatedTransition : NSObject <UIViewControllerTransitioningDelegate>
 
 #pragma mark - Present
+
 - (void)setPresentFromWithView:(UIImageView *)view;
 
 #pragma mark - Dismiss
+
 - (void)setPictureImageViewsFrame:(NSArray *)frames;
 
 #pragma mark - Interactive
+
 - (void)setViewController:(JOAlbumBrowserViewController *)toViewController fromWindow:(UIView *)fromView;
 
 @end

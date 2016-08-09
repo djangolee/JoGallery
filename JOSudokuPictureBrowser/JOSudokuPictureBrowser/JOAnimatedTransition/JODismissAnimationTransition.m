@@ -19,6 +19,7 @@
 @implementation JODismissAnimationTransition
 
 #pragma mark - Lief cycle
+
 - (instancetype)initWithDuration:(NSTimeInterval)duration {
     self = [super init];
     if (self) {
@@ -28,6 +29,7 @@
 }
 
 #pragma mark - UIViewControllerAnimatedTransitioning
+
 - (NSTimeInterval)transitionDuration:(nullable id <UIViewControllerContextTransitioning>)transitionContext {
     return self.duration;
 }
@@ -47,13 +49,14 @@
     
     JOAlbumBrowserViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     CGRect toFrame = [self.pictureFrames[fromViewController.currentIndex] CGRectValue];
-    CGRect fromFrame = fromViewController.currentFrame; //[fromViewController.currentImageView convertRect:fromViewController.currentImageView.bounds toView:toViewController.view];
+    CGRect fromFrame = fromViewController.currentFrame;
     CGAffineTransform transform = fromViewController.currentTransform;
     
     substituteView.frame = toFrame;
     maskView.alpha = sqrt(transform.a * transform.a + transform.c * transform.c);
     
     UIView *imageView = [[UIImageView alloc] initWithImage:fromViewController.currentImageView.image];
+    imageView.clipsToBounds = YES;
     imageView.frame = fromFrame;
     imageView.transform = transform;
     imageView.contentMode = UIViewContentModeScaleAspectFill;

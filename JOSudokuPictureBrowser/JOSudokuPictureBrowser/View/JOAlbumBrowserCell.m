@@ -16,9 +16,9 @@
 
 @interface JOAlbumBrowserCell () <UIScrollViewDelegate>
 
-@property (nonatomic, strong) JOImageView *pictureImageView;
-@property (nonatomic, strong) UIButton *fullPictureButton;
 @property (nonatomic, strong) JOPictureSouceModel *model;
+@property (nonatomic, strong) UIButton *fullPictureButton;
+@property (nonatomic, strong) JOImageView *pictureImageView;
 @property (nonatomic, strong) YYWebImageOperation *operation;
 
 @end
@@ -26,6 +26,7 @@
 @implementation JOAlbumBrowserCell
 
 #pragma mark - Life cycle
+
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -35,6 +36,7 @@
 }
 
 #pragma mark - Public methods
+
 - (void)showWithModel:(JOPictureSouceModel *)model {
     self.model = model;
     
@@ -44,36 +46,57 @@
         [self.fullPictureButton setTitle:@"Full Image" forState:(UIControlStateNormal)];
         self.fullPictureButton.enabled = YES;
     }
-    NSURL *url = [NSURL URLWithString:model.origin];
-    
-    self.pictureImageView.image = nil;
-    [self.operation cancel];      
-    self.operation = [[YYWebImageManager sharedManager] requestImageWithURL:url options:kNilOptions progress:^(NSInteger receivedSize, NSInteger expectedSize) {
-        
-    } transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
-        if (!error && image) {
-            self.pictureImageView.image = image;
-        }
+    [self setImageWithUrl:[NSURL URLWithString:fullimageDowned ? model.origin : model.img_300] progress:nil];
+}
+
+- (void)setImageWithUrl:(NSURL *)url progress:(YYWebImageProgressBlock)progress {
+    [self.operation cancel];
+    self.operation = nil;
+    self.operation = [[YYWebImageManager sharedManager] requestImageWithURL:url
+                                                                    options:kNilOptions
+                                                                   progress:progress
+                                                                  transform:nil
+                                                                 completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
+         dispatch_async(dispatch_get_main_queue(), ^{
+             self.pictureImageView.image = image;
+             if (progress) {
+                 [self.fullPictureButton setTitle:@"finsh" forState:(UIControlStateNormal)];
+                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                     self.fullPictureButton.hidden = YES;
+                 });
+             }
+         });
     }];
+    
+    
+    [[UIImageView new] yy_imageURL];
 }
 
 - (void)setImageViewDelegate:(id <JOImageViewTransformDelegate>)delegate {
     self.pictureImageView.delegate = delegate;
 }
 
-
 #pragma mark - Private methods
 
 #pragma mark - Event methods
 
-
 - (void)showFullPicture:(UIButton *)button {
     button.enabled = NO;
     [button setTitle:@"Loading..." forState:(UIControlStateNormal)];
+    __weak typeof(self) _self = self;
+    [self setImageWithUrl:[NSURL URLWithString:self.model.origin] progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+        if (receivedSize != -1 && expectedSize != -1) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                CGFloat progress = 100.0 * receivedSize / expectedSize;
+                [_self.fullPictureButton setTitle:[NSString stringWithFormat:@"%.2f%%", progress] forState:(UIControlStateNormal)];
+            });
+        }
+    }];
 }
 
 
 #pragma mark - Initialize subviews and make subviews for layout
+
 - (void)setupView {
     [self addSubviews];
     [self makeSubviewsLayout];
@@ -100,6 +123,7 @@
 - (JOImageView *)pictureImageView {
     if (!_pictureImageView) {
         _pictureImageView = [JOImageView new];
+        _pictureImageView.placeholderImage = [UIImage imageNamed:JOSudokuPicturePlaceholderImageName];
     }
     return _pictureImageView;
 }

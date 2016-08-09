@@ -24,16 +24,19 @@ static CGFloat const duration = 0.5;
 @implementation JOAnimatedTransition
 
 #pragma mark - Present
+
 - (void)setPresentFromWithView:(UIImageView *)view {
     self.presentAnimationTransition.transitionView = view;
 }
 
 #pragma mark - Dismiss
+
 - (void)setPictureImageViewsFrame:(NSArray *)frames {
     self.dismissAnimationTransition.pictureFrames = frames;
 }
 
 #pragma mark - Interactive
+
 - (void)setViewController:(JOAlbumBrowserViewController *)toViewController fromWindow:(UIView *)fromView {
     self.interactiveTransition.toViewController = toViewController;
     self.interactiveTransition.fromView = fromView;
@@ -41,6 +44,7 @@ static CGFloat const duration = 0.5;
 
 
 #pragma mark - UIViewControllerTransitioningDelegate
+
 - (nullable id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
     return self.presentAnimationTransition;
 }
@@ -54,6 +58,7 @@ static CGFloat const duration = 0.5;
 }
 
 #pragma mark - Setter and getter
+
 - (JOPresentAnimationTransition *)presentAnimationTransition {
     if (!_presentAnimationTransition) {
         _presentAnimationTransition = [[JOPresentAnimationTransition alloc] initWithDuration:duration];

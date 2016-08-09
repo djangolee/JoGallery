@@ -28,6 +28,7 @@ static void * contentSizeKey = &contentSizeKey;
 @implementation JOAlbumBrowserViewController
 
 #pragma mark - Life cycle
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupView];
@@ -44,7 +45,7 @@ static void * contentSizeKey = &contentSizeKey;
 }
 
 - (void)addObservers {
-    [self.collectionView addObserver:self forKeyPath:ContentSizeKeyPath options:NSKeyValueObservingOptionNew context:contentSizeKey];
+    [self.collectionView addObserver:self forKeyPath:ContentSizeKeyPath options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:contentSizeKey];
 }
 
 - (void)removeObservers {
@@ -53,13 +54,18 @@ static void * contentSizeKey = &contentSizeKey;
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
     if (context == contentSizeKey) {
-        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0] atScrollPosition:(UICollectionViewScrollPositionLeft) animated:NO];
-        self.pageNumLabel.text = [NSString stringWithFormat:@"%ld / %ld", self.currentIndex + 1, self.albumSouce.count];
+        CGSize oldSize = [change[NSKeyValueChangeOldKey] CGSizeValue];
+        CGSize newSize = [change[NSKeyValueChangeNewKey] CGSizeValue];
+        if (!CGSizeEqualToSize(oldSize, newSize)) {
+            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0] atScrollPosition:(UICollectionViewScrollPositionLeft) animated:NO];
+            self.pageNumLabel.text = [NSString stringWithFormat:@"%ld / %ld", self.currentIndex + 1, self.albumSouce.count];
+        }
     }
 }
 
 
 #pragma mark - UICollectionViewDataSource
+
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return self.albumSouce.count;
 }
@@ -76,12 +82,14 @@ static void * contentSizeKey = &contentSizeKey;
 }
 
 #pragma mark - UIScrollViewDelegate
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     self.currentIndex = [self.collectionView indexPathsForVisibleItems].firstObject.item;
     self.pageNumLabel.text = [NSString stringWithFormat:@"%ld / %ld", [self.collectionView indexPathsForVisibleItems].firstObject.item + 1, self.albumSouce.count];
 }
 
 #pragma mark - JOImageViewTransformDelegate
+
 - (void)beganTransformImageView:(UIImageView *)imageView {
     self.currentImageView = imageView;
     self.substituteView.frame = [self.imageViewFrames[self.currentIndex] CGRectValue];
@@ -119,6 +127,7 @@ static void * contentSizeKey = &contentSizeKey;
 }
 
 #pragma mark - Initialize subviews and make subviews for layout
+
 - (void)setupView {
     [self addSubviews];
     [self makeSubviewsLayout];
@@ -141,6 +150,7 @@ static void * contentSizeKey = &contentSizeKey;
 }
 
 #pragma mark - Setter and getter
+
 - (UICollectionView *)collectionView {
     if (!_collectionView) {
         UICollectionViewFlowLayout *flowLayout = [UICollectionViewFlowLayout new];
