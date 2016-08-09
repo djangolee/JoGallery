@@ -10,6 +10,8 @@
 
 @class JOPictureSouceModel;
 
+extern NSString * const JOAlbumBrowserNoitifaction;
+
 @interface JOAlbumBrowserViewController : UIViewController
 
 @property (nonatomic, strong) UIView *backgroundView;

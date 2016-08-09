@@ -58,7 +58,7 @@ static void * contentSizeKey = &contentSizeKey;
         CGSize newSize = [change[NSKeyValueChangeNewKey] CGSizeValue];
         if (!CGSizeEqualToSize(oldSize, newSize)) {
             [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.currentIndex inSection:0] atScrollPosition:(UICollectionViewScrollPositionLeft) animated:NO];
-            self.pageNumLabel.text = [NSString stringWithFormat:@"%ld / %ld", self.currentIndex + 1, self.albumSouce.count];
+            self.pageNumLabel.text = [NSString stringWithFormat:@"%lu / %ld", self.currentIndex + 1, self.albumSouce.count];
         }
     }
 }
