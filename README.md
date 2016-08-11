@@ -1,5 +1,6 @@
 # JOSudokuPictureView
-九宫格图片浏览器 
+参考iPHone系统相册的交互体验 
+
 
 ![](https://github.com/djangolee/JOSudokuPictureView/blob/master/1.gif)
 ![](https://github.com/djangolee/JOSudokuPictureView/blob/master/2.gif)
