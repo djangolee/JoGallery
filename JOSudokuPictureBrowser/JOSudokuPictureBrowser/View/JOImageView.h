@@ -1,8 +1,8 @@
 //
 //  JOImageView.h
-//  GestureRecognizerDemo
+//  CALayerDemo
 //
-//  Created by django on 8/5/16.
+//  Created by django on 8/10/16.
 //  Copyright © 2016 django. All rights reserved.
 //
 
@@ -10,29 +10,25 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class JOImageView;
-
 @protocol JOImageViewTransformDelegate <NSObject>
 
 @optional
 
-- (void)beganTransformImageView:(UIImageView *)imageView;
-- (void)imageView:(UIImageView *)imageview changeTransform:(CGAffineTransform) transform;
-- (void)imageView:(UIImageView *)imageview endTransform:(CGAffineTransform) transform frame:(CGRect)frame;
-- (void)longPressImageView:(UIImageView *)imageview;
-- (void)singlePressimageView:(UIImageView *)imageview;
-- (void)doublePressimageView:(UIImageView *)imageview;
+- (void)beganTransformOfRecognizer:(UIGestureRecognizer *)recognizer;
+- (void)changedTransformOfRecognizer:(UIGestureRecognizer *)recognizer;
+- (void)endedTransformOfRecognizer:(UIGestureRecognizer *)recognizer;
+- (void)longPressOfRecognizer:(UIGestureRecognizer *)recognizer;
+- (void)singlePressOfRecognizer:(UIGestureRecognizer *)recognizer;
+- (void)doublePressOfRecognizer:(UIGestureRecognizer *)recognizer;
 
 @end
 
 @interface JOImageView : UIView
 
-@property (nonatomic) CGFloat minimumZoomScale;
-@property (nonatomic) CGFloat maximumZoomScale;
+@property (nonatomic, strong, nullable) UIImage *image;
+@property (nonatomic, strong, nullable) UIImage *placeholderImage;
 @property (nonatomic, strong, readonly) UIImageView *imageView;
-@property (nullable, nonatomic, strong) UIImage *image;
-@property (nullable, nonatomic, strong) UIImage *placeholderImage;
-@property (nullable, nonatomic, weak) id <JOImageViewTransformDelegate> delegate;
+@property (nonatomic, weak, nullable) id <JOImageViewTransformDelegate> delegate;
 
 + (CGSize)imageSizeToFit:(nullable UIImage *)image;
 

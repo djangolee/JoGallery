@@ -90,41 +90,51 @@ static void * contentSizeKey = &contentSizeKey;
 
 #pragma mark - JOImageViewTransformDelegate
 
-- (void)beganTransformImageView:(UIImageView *)imageView {
-    self.currentImageView = imageView;
+- (void)beganTransformOfRecognizer:(UIGestureRecognizer *)recognizer {
+    self.currentImageView = (UIImageView *)recognizer.view;
     self.substituteView.frame = [self.imageViewFrames[self.currentIndex] CGRectValue];
 }
 
-- (void)imageView:(UIImageView *)imageview changeTransform:(CGAffineTransform)transform {
+- (void)changedTransformOfRecognizer:(UIGestureRecognizer *)recognizer {
+    CGAffineTransform transform = recognizer.view.transform;
     CGFloat scale = sqrt(transform.a * transform.a + transform.c * transform.c);
     self.maskView.alpha = scale;
+    
+    self.currentImageView = (UIImageView *)recognizer.view;
+    self.currentTransform = recognizer.view.transform;
+    self.currentFrame = [recognizer.view convertRect:recognizer.view.bounds toView:self.view];
+    
+    
 }
 
-- (void)imageView:(UIImageView *)imageview endTransform:(CGAffineTransform)transform frame:(CGRect)frame {
-    self.currentImageView = imageview;
-    self.currentTransform = transform;
-    self.currentFrame = frame;
-    CGFloat scale = sqrt(transform.a * transform.a + transform.c * transform.c);    
-    if (scale < 0.9) {
-        [self dismissViewControllerAnimated:YES completion:nil];
-    } else {
-        self.currentImageView = nil;
-        [UIView animateWithDuration:0.25 animations:^{
-            self.maskView.alpha = 1;
-        }];
+- (void)endedTransformOfRecognizer:(UIGestureRecognizer *)recognizer {
+    if ([recognizer isKindOfClass:[UIPinchGestureRecognizer class]]) {
+        CGFloat scale = sqrt(self.currentTransform.a * self.currentTransform.a + self.currentTransform.c * self.currentTransform.c);
+        if (scale < 0.9) {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        } else {
+            self.currentImageView = nil;
+            [UIView animateWithDuration:0.25 animations:^{
+                self.maskView.alpha = 1;
+            }];
+        }
     }
 }
-
-- (void)longPressImageView:(UIImageView *)imageview {
-    NSLog(@"%s", __func__);
+- (void)longPressOfRecognizer:(UIGestureRecognizer *)recognizer {
+    
 }
 
-- (void)singlePressimageView:(UIImageView *)imageview {
-    [self beganTransformImageView:imageview];
+- (void)singlePressOfRecognizer:(UIGestureRecognizer *)recognizer {
+    [self beganTransformOfRecognizer:recognizer];
     self.currentTransform = CGAffineTransformMake(1, 0, 0, 1, 0, 0);
-    self.currentFrame = [imageview convertRect:imageview.bounds toView:self.view];
+    self.currentFrame = [recognizer.view convertRect:recognizer.view.bounds toView:self.view];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+
+- (void)doublePressOfRecognizer:(UIGestureRecognizer *)recognizer {
+    
+}
+
 
 #pragma mark - Initialize subviews and make subviews for layout
 
