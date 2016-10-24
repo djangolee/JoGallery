@@ -193,6 +193,9 @@ static CGFloat const maximumZoomScale = 2.0;
 }
 
 - (void)handleSinglePress:(UITapGestureRecognizer *)recognizer {
+    if (recognizer.view != self.imageView) {
+        recognizer = self.imageView.gestureRecognizers.firstObject;
+    }
     if (self.delegate && [self.delegate respondsToSelector:@selector(singlePressOfRecognizer:)]) {
         [self.delegate singlePressOfRecognizer:recognizer];
     }
@@ -291,6 +294,8 @@ static CGFloat const maximumZoomScale = 2.0;
     [self addSubviews];
     [self bindingSubviewsLayout];
     [self bindingCustomGestureRecognizerWithView:self.imageView];
+    UITapGestureRecognizer *singleRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSinglePress:)];
+    [self.scrollView addGestureRecognizer:singleRecognizer];
 }
 
 - (void)addSubviews {
