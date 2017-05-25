@@ -90,10 +90,10 @@
 		D8B2247D1ED6FBCC0058C7C2 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				D8B2247E1ED6FBE60058C7C2 /* Supporting Files */,
 				D8B2248A1ED6FC790058C7C2 /* JoAppDelegate.swift */,
 				D8B2248D1ED6FD0D0058C7C2 /* JoViewController.swift */,
 				D8B2248C1ED6FD0D0058C7C2 /* JoNavigationController.swift */,
+				D8B2247E1ED6FBE60058C7C2 /* Supporting Files */,
 			);
 			path = Source;
 			sourceTree = "<group>";
