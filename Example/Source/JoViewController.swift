@@ -26,7 +26,7 @@ class JoViewController: UIViewController {
 
 extension JoViewController {
     @objc fileprivate func onClickButton(_ sender: UIButton) {
-        print(#function)
+        self.navigationController?.pushViewController(JoPhotosViewController(), animated: true)
     }
 }
 

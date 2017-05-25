@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class JoGalleryController: UIViewController {
+open class JoGalleryController: UIViewController {
 
     let tempView = UIView()
     
@@ -63,27 +63,27 @@ public class JoGalleryController: UIViewController {
     
     // MARK: Self.view life cycle
     
-    override public func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         setup()
     }
     
-    override public func viewWillAppear(_ animated: Bool) {
+    override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         adjustScrollToItem(to: currentIndexPath)
     }
 
-    override public func viewDidAppear(_ animated: Bool) {
+    override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
     
-    override public func viewDidLayoutSubviews() {
+    override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
         adjustScrollToItem(to: currentIndexPath)
     }
     
-    override public func setNeedsStatusBarAppearanceUpdate() {
+    override open func setNeedsStatusBarAppearanceUpdate() {
         if self.backgroundView.alpha < 0.9 {
             self.isStatusBarHidden = self.fromParent?.prefersStatusBarHidden ?? self.isStatusBarHidden
         } else {
@@ -92,19 +92,19 @@ public class JoGalleryController: UIViewController {
         super.setNeedsStatusBarAppearanceUpdate()
     }
     
-    override public var prefersStatusBarHidden: Bool {
+    override open var prefersStatusBarHidden: Bool {
         return isStatusBarHidden
     }
     
-    override public var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+    override open var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         return .slide
     }
     
-    override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    override open var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .portrait
     }
     
-    override public var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+    override open var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
         return .portrait
     }
 }

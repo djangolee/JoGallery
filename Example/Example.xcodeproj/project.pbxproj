@@ -13,6 +13,7 @@
 		D8B2248F1ED6FD0D0058C7C2 /* JoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B2248D1ED6FD0D0058C7C2 /* JoViewController.swift */; };
 		D8B224E81ED708DE0058C7C2 /* JoGallery.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8B224D21ED7010C0058C7C2 /* JoGallery.framework */; };
 		D8B224E91ED708DE0058C7C2 /* JoGallery.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D8B224D21ED7010C0058C7C2 /* JoGallery.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D8B224F21ED7217E0058C7C2 /* JoPhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B224F11ED7217E0058C7C2 /* JoPhotosViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,7 @@
 		D8B2248C1ED6FD0D0058C7C2 /* JoNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoNavigationController.swift; sourceTree = "<group>"; };
 		D8B2248D1ED6FD0D0058C7C2 /* JoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoViewController.swift; sourceTree = "<group>"; };
 		D8B224CD1ED7010C0058C7C2 /* JoGallery.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = JoGallery.xcodeproj; path = ../JoGallery.xcodeproj; sourceTree = "<group>"; };
+		D8B224F11ED7217E0058C7C2 /* JoPhotosViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoPhotosViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +92,7 @@
 		D8B2247D1ED6FBCC0058C7C2 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				D8B224F01ED721750058C7C2 /* Photos */,
 				D8B2248A1ED6FC790058C7C2 /* JoAppDelegate.swift */,
 				D8B2248D1ED6FD0D0058C7C2 /* JoViewController.swift */,
 				D8B2248C1ED6FD0D0058C7C2 /* JoNavigationController.swift */,
@@ -124,6 +127,14 @@
 				D8B224D21ED7010C0058C7C2 /* JoGallery.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D8B224F01ED721750058C7C2 /* Photos */ = {
+			isa = PBXGroup;
+			children = (
+				D8B224F11ED7217E0058C7C2 /* JoPhotosViewController.swift */,
+			);
+			path = Photos;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -216,6 +227,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8B224F21ED7217E0058C7C2 /* JoPhotosViewController.swift in Sources */,
 				D8B2248E1ED6FD0D0058C7C2 /* JoNavigationController.swift in Sources */,
 				D8B2248B1ED6FC790058C7C2 /* JoAppDelegate.swift in Sources */,
 				D8B2248F1ED6FD0D0058C7C2 /* JoViewController.swift in Sources */,

@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class JoGalleryCell: UICollectionViewCell {
+open class JoGalleryCell: UICollectionViewCell {
     
     // MARK: Member variable
     
@@ -40,7 +40,7 @@ public class JoGalleryCell: UICollectionViewCell {
         }
     }
     
-    override public func didMoveToSuperview() {
+    override open func didMoveToSuperview() {
         super.didMoveToSuperview()
         var next: UIResponder? = nil
         if let superview = superview {
@@ -78,7 +78,7 @@ extension JoGalleryCell {
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
     }
     
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if let scrollView = collectionView {
             scrollViewDidScroll(scrollView)
         }
