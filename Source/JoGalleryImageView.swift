@@ -101,21 +101,12 @@ extension JoGalleryImageView {
         }
     }
     
-    open class func imageAttributes(_ view: UIView?, with size: CGSize?) -> UICollectionViewLayoutAttributes? {
-        guard let view = view, let size = size else {
-            return nil
-        }
+    open class func imageAttributes(_ image: UIImage, with size: CGSize) -> UICollectionViewLayoutAttributes? {
+        
         let attributes = UICollectionViewLayoutAttributes()
-        
-        if let imageView = view as? UIImageView, let image = imageView.image {
-            attributes.size = image.size
-        } else {
-            attributes.size = view.frame.size
-        }
-        let viewSize = size.equalTo(CGSize.zero) ? UIScreen.main.bounds.size : size
-        attributes.size = JoGalleryImageView.imageSizeRange(attributes.size, with: viewSize).defaultSize
-        attributes.center = CGPoint(x: viewSize.width / 2, y: viewSize.height / 2)
-        
+
+        attributes.size = JoGalleryImageView.imageSizeRange(image.size, with: size).defaultSize
+        attributes.center = CGPoint(x: image.size.width / 2, y: image.size.height / 2)
         
         return attributes
     }

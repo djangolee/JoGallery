@@ -13,6 +13,7 @@
 		D8B224E41ED707EB0058C7C2 /* JoGalleryImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B224DF1ED707EB0058C7C2 /* JoGalleryImageView.swift */; };
 		D8B224E51ED707EB0058C7C2 /* JoGalleryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B224E01ED707EB0058C7C2 /* JoGalleryProtocol.swift */; };
 		D8B224E61ED707EB0058C7C2 /* JoGlleryTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B224E11ED707EB0058C7C2 /* JoGlleryTransitioning.swift */; };
+		D8E393A41ED8863C00DEE310 /* JoGalleryKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E393A31ED8863C00DEE310 /* JoGalleryKit.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		D8B224DF1ED707EB0058C7C2 /* JoGalleryImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoGalleryImageView.swift; sourceTree = "<group>"; };
 		D8B224E01ED707EB0058C7C2 /* JoGalleryProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoGalleryProtocol.swift; sourceTree = "<group>"; };
 		D8B224E11ED707EB0058C7C2 /* JoGlleryTransitioning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoGlleryTransitioning.swift; sourceTree = "<group>"; };
+		D8E393A31ED8863C00DEE310 /* JoGalleryKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoGalleryKit.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 				D8B224DF1ED707EB0058C7C2 /* JoGalleryImageView.swift */,
 				D8B224E01ED707EB0058C7C2 /* JoGalleryProtocol.swift */,
 				D8B224E11ED707EB0058C7C2 /* JoGlleryTransitioning.swift */,
+				D8E393A31ED8863C00DEE310 /* JoGalleryKit.swift */,
 				D8B224CC1ED700AA0058C7C2 /* Supporting Files */,
 			);
 			path = Source;
@@ -159,6 +162,7 @@
 				D8B224E51ED707EB0058C7C2 /* JoGalleryProtocol.swift in Sources */,
 				D8B224E21ED707EB0058C7C2 /* JoGalleryCell.swift in Sources */,
 				D8B224E31ED707EB0058C7C2 /* JoGalleryController.swift in Sources */,
+				D8E393A41ED8863C00DEE310 /* JoGalleryKit.swift in Sources */,
 				D8B224E61ED707EB0058C7C2 /* JoGlleryTransitioning.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

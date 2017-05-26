@@ -26,7 +26,7 @@ extension JoGalleryDataSource {
 
 public protocol JoGalleryDelegate: NSObjectProtocol {
     
-    typealias JoGalleryLocationAttributes = (location: UIView, content: UIImage)
+    typealias JoGalleryLocationAttributes = (location: UIView, content: Any)
     
     func presentForTransitioning(in galleryController: JoGalleryController, openAt indexPath: IndexPath) -> JoGalleryLocationAttributes?
     func presentTransitionCompletion(in galleryController: JoGalleryController, openAt indexPath: IndexPath)

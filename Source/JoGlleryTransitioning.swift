@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Photos
 
 class JoGlleryTransitioning: NSObject {
     
@@ -109,7 +110,11 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
             imageView.clipsToBounds = location.location.clipsToBounds
             imageView.layer.masksToBounds = location.location.layer.masksToBounds
             imageView.contentMode = location.location.contentMode
-            imageView.image = location.content
+            
+            JoGalleryKit.image(location.content, resultHandler: { (image) in
+                imageView.image = image
+            })
+            
             imageView.frame = location.location.convert(location.location.bounds, to: fromView)
             
             presentedView.addSubview(maskView)
@@ -155,7 +160,10 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
             imageView.clipsToBounds = location.location.clipsToBounds
             imageView.layer.masksToBounds = location.location.layer.masksToBounds
             imageView.contentMode = location.location.contentMode
-            imageView.image = location.content
+            
+            JoGalleryKit.image(location.content, resultHandler: { (image) in
+                imageView.image = image
+            })
             
             imageView.frame.size = transition.size
             imageView.center = transition.center
@@ -214,7 +222,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         }
     }
     
-    func freeResource() {
+    private func freeResource() {
         parentLocationAttributes = nil
         dismissLocationAttributes = nil
         

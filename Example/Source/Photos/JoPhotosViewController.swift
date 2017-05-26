@@ -56,7 +56,7 @@ extension JoPhotosViewController: JoGalleryDataSource, JoGalleryDelegate {
         guard let cell = collectionView.cellForItem(at: indexPath) as? JoPhotosViewCellCollectionViewCell else {
             return nil
         }
-        return (cell.imageView, cell.imageView.image!)
+        return (cell.imageView, assets[indexPath.item])
     }
     
     func presentTransitionCompletion(in galleryController: JoGalleryController, openAt indexPath: IndexPath) {
@@ -67,7 +67,7 @@ extension JoPhotosViewController: JoGalleryDataSource, JoGalleryDelegate {
         guard let cell = collectionView.cellForItem(at: indexPath) as? JoPhotosViewCellCollectionViewCell else {
             return nil
         }
-        return (cell.imageView, cell.imageView.image!)
+        return (cell.imageView, assets[indexPath.item])
     }
     
     func dismissTransitionCompletion(in galleryController: JoGalleryController, closeAt indexPath: IndexPath) {
