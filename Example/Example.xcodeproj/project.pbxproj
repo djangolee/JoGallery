@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D889CDA21ED83C9000262C0C /* JoPhotosViewCellCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D889CDA11ED83C9000262C0C /* JoPhotosViewCellCollectionViewCell.swift */; };
 		D8B224861ED6FBF50058C7C2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D8B2247F1ED6FBF50058C7C2 /* Assets.xcassets */; };
 		D8B2248B1ED6FC790058C7C2 /* JoAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B2248A1ED6FC790058C7C2 /* JoAppDelegate.swift */; };
 		D8B2248E1ED6FD0D0058C7C2 /* JoNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B2248C1ED6FD0D0058C7C2 /* JoNavigationController.swift */; };
@@ -48,6 +49,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D889CDA11ED83C9000262C0C /* JoPhotosViewCellCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoPhotosViewCellCollectionViewCell.swift; sourceTree = "<group>"; };
 		D8B224671ED6FA610058C7C2 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8B2247F1ED6FBF50058C7C2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		D8B224821ED6FBF50058C7C2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				D8B224F11ED7217E0058C7C2 /* JoPhotosViewController.swift */,
+				D889CDA11ED83C9000262C0C /* JoPhotosViewCellCollectionViewCell.swift */,
 			);
 			path = Photos;
 			sourceTree = "<group>";
@@ -231,6 +234,7 @@
 				D8B2248E1ED6FD0D0058C7C2 /* JoNavigationController.swift in Sources */,
 				D8B2248B1ED6FC790058C7C2 /* JoAppDelegate.swift in Sources */,
 				D8B2248F1ED6FD0D0058C7C2 /* JoViewController.swift in Sources */,
+				D889CDA21ED83C9000262C0C /* JoPhotosViewCellCollectionViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,7 +372,7 @@
 				DEVELOPMENT_TEAM = 673AB3A2L9;
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.django.Example;
+				PRODUCT_BUNDLE_IDENTIFIER = com.django.jogalleryexample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
@@ -384,7 +388,7 @@
 				DEVELOPMENT_TEAM = 673AB3A2L9;
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.django.Example;
+				PRODUCT_BUNDLE_IDENTIFIER = com.django.jogalleryexample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
