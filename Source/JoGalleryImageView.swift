@@ -47,14 +47,8 @@ public class JoGalleryImageView: UIView {
     fileprivate let scrollView = UIScrollView()
     fileprivate weak var scrollViewPinchGestureRecognizer: UIPinchGestureRecognizer? {
         didSet {
-            if oldValue != scrollViewPinchGestureRecognizer {
-                if let old = oldValue {
-                    removeObserver(old)
-                }
-                if let new = scrollViewPinchGestureRecognizer {
-                    addObserver(new)
-                }
-            }
+            removeObserver(oldValue)
+            addObserver(scrollViewPinchGestureRecognizer)
         }
     }
     
@@ -76,9 +70,7 @@ public class JoGalleryImageView: UIView {
     }
     
     deinit {
-        if let scrollViewPinchGestureRecognizer = scrollViewPinchGestureRecognizer {
-            removeObserver(scrollViewPinchGestureRecognizer)
-        }
+        removeObserver(scrollViewPinchGestureRecognizer)
     }
     
     override public func layoutSubviews() {
@@ -328,12 +320,12 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
 
 extension JoGalleryImageView {
     
-    fileprivate func addObserver(_ gestureRecognizer: UIGestureRecognizer) {
-        gestureRecognizer.addObserver(self, forKeyPath: #keyPath(UIGestureRecognizer.state), options: .new, context: nil)
+    fileprivate func addObserver(_ gestureRecognizer: UIGestureRecognizer?) {
+        gestureRecognizer?.addObserver(self, forKeyPath: #keyPath(UIGestureRecognizer.state), options: .new, context: nil)
     }
     
-    fileprivate func removeObserver(_ gestureRecognizer: UIGestureRecognizer) {
-        gestureRecognizer.removeObserver(self, forKeyPath: #keyPath(UIGestureRecognizer.state))
+    fileprivate func removeObserver(_ gestureRecognizer: UIGestureRecognizer?) {
+        gestureRecognizer?.removeObserver(self, forKeyPath: #keyPath(UIGestureRecognizer.state))
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {

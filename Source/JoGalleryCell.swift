@@ -17,13 +17,9 @@ open class JoGalleryCell: UICollectionViewCell {
     
     fileprivate var layoutCenterX: NSLayoutConstraint?
     fileprivate weak var collectionView: UICollectionView? {
-        willSet {
-            if let scrollView = collectionView {
-                removeObserver(scrollView)
-            }
-            if let scrollView = newValue {
-                addObserver(scrollView)
-            }
+        didSet {
+            removeObserver(oldValue)
+            addObserver(collectionView)
         }
     }
     
@@ -35,18 +31,18 @@ open class JoGalleryCell: UICollectionViewCell {
     }
     
     deinit {
-        if let collectionView = collectionView {
-            removeObserver(collectionView)
-        }
+        removeObserver(collectionView)
     }
     
     override open func didMoveToSuperview() {
         super.didMoveToSuperview()
+        
         var next: UIResponder? = nil
         if let superview = superview {
             next = superview
             while true {
                 if next is UICollectionView {
+                    next = nil
                     break
                 } else if next == nil {
                     break
@@ -54,8 +50,10 @@ open class JoGalleryCell: UICollectionViewCell {
                     next = next?.next
                 }
             }
+            collectionView = next as? UICollectionView
+        } else {
+            collectionView = nil
         }
-        collectionView = next as? UICollectionView
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -69,13 +67,12 @@ extension JoGalleryCell {
     
     static let contentOffsetKeyPath: String = "contentOffset"
     
-    fileprivate func addObserver(_ scrollView: UIScrollView) {
-        scrollViewDidScroll(scrollView)
-        scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset), options: .new, context: nil)
+    fileprivate func addObserver(_ scrollView: UIScrollView?) {
+        scrollView?.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset), options: .new, context: nil)
     }
     
-    fileprivate func removeObserver(_ scrollView: UIScrollView) {
-        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
+    fileprivate func removeObserver(_ scrollView: UIScrollView?) {
+        scrollView?.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
     }
     
     override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {

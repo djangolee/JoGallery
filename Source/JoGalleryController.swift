@@ -9,8 +9,6 @@
 import UIKit
 
 open class JoGalleryController: UIViewController {
-
-    let tempView = UIView()
     
     // MARK: Member variable
     
@@ -73,13 +71,8 @@ open class JoGalleryController: UIViewController {
         adjustScrollToItem(to: currentIndexPath)
     }
 
-    override open func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    }
-    
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
         adjustScrollToItem(to: currentIndexPath)
     }
     
@@ -333,7 +326,6 @@ extension JoGalleryController {
         view.backgroundColor = .clear
         setupBackgroundView()
         setupCollection()
-        setupTempView()
         bindingSubviewsLayout()
     }
     
@@ -369,13 +361,6 @@ extension JoGalleryController {
         collectionView.isPagingEnabled = true
         collectionView.bounces = true
         view.addSubview(collectionView)
-    }
-    
-    private func setupTempView() {
-        tempView.isUserInteractionEnabled = false
-        tempView.layer.borderWidth = 1
-        tempView.layer.borderColor = UIColor.white.cgColor
-        view.addSubview(tempView)
     }
 }
 
