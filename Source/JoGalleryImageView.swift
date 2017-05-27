@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Photos
 
 public class JoGalleryImageView: UIView {
     
@@ -27,9 +28,23 @@ public class JoGalleryImageView: UIView {
     
     open weak var delegate: JoGalleryImageViewDelegate?
     open let contentView = UIView()
+    
+    private let loadImageQueue = OperationQueue()
+    
     open var image: UIImage? {
         didSet {
             updateImage(image)
+        }
+    }
+    open var asset: PHAsset? {
+        didSet {
+            loadImageQueue.cancelAllOperations()
+            self.updateImage(nil)
+            loadImageQueue.addOperation {
+                JoGalleryKit.default.image(self.asset) { (image) in
+                    self.updateImage(image)
+                }
+            }
         }
     }
     
@@ -101,13 +116,11 @@ extension JoGalleryImageView {
         }
     }
     
-    open class func imageAttributes(_ image: UIImage, with size: CGSize) -> UICollectionViewLayoutAttributes? {
-        
+    open class func imageAttributes(_ content: Any) -> UICollectionViewLayoutAttributes? {
         let attributes = UICollectionViewLayoutAttributes()
-
-        attributes.size = JoGalleryImageView.imageSizeRange(image.size, with: size).defaultSize
-        attributes.center = CGPoint(x: image.size.width / 2, y: image.size.height / 2)
-        
+        let range = JoGalleryKit.default.imageSizeRange(content: content)
+        attributes.size = range.defaultSize
+        attributes.center = CGPoint(x: range.contentSize.width / 2, y: range.contentSize.height / 2)
         return attributes
     }
     
@@ -420,8 +433,7 @@ extension JoGalleryImageView: UIScrollViewDelegate {
 extension JoGalleryImageView {
     
     fileprivate func updateImage(_ updateImage: UIImage?) {
-        
-        let range = JoGalleryImageView.imageSizeRange(updateImage?.size, with: bounds.size)
+        let range = JoGalleryKit.default.imageSizeRange(content: updateImage)
         scrollView.zoomScale = 1
         scrollView.minimumZoomScale = 1
         scrollView.maximumZoomScale = max(range.maximumZoomScale, 2)
@@ -434,36 +446,12 @@ extension JoGalleryImageView {
     }
     
     fileprivate func adjustImageCenter() {
-        
         var center = CGPoint.zero
         center.x = max(scrollView.contentSize.width, scrollView.bounds.width) / 2
         center.y = max(scrollView.contentSize.height, scrollView.bounds.height) / 2
         imageView.center = center
     }
     
-    fileprivate class func imageSizeRange(_ originSize: CGSize?, with viewSize: CGSize) -> (defaultSize: CGSize, contentSize: CGSize, maximumZoomScale: CGFloat) {
-        
-        guard let originSize = originSize, !originSize.equalTo(CGSize.zero), !viewSize.equalTo(CGSize.zero) else {
-            return (CGSize.zero, CGSize.zero, 2)
-        }
-        
-        var defaultSize = originSize
-        var contentSize = CGSize.zero
-        var maximumZoomScale: CGFloat = 1
-        let aspectRatio = viewSize.width / viewSize.height
-
-        let imageAspectRatio = originSize.width / originSize.height;
-        if imageAspectRatio < aspectRatio {
-            defaultSize.height = viewSize.height < defaultSize.height ? viewSize.height : defaultSize.height
-            defaultSize.width = defaultSize.height * imageAspectRatio
-        } else {
-            defaultSize.width = viewSize.width < defaultSize.width ? viewSize.width : defaultSize.width
-            defaultSize.height = defaultSize.width * (1 / imageAspectRatio)
-        }
-        maximumZoomScale = originSize.width * 2 / defaultSize.width
-        contentSize = CGSize(width: max(defaultSize.width, viewSize.width), height: max(defaultSize.height, viewSize.height))
-        return (defaultSize, contentSize, maximumZoomScale)
-    }
 }
 
 // MARK: Setup

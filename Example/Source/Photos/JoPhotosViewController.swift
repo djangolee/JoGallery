@@ -42,11 +42,7 @@ extension JoPhotosViewController: JoGalleryDataSource, JoGalleryDelegate {
     func galleryController(_ galleryController: JoGalleryController, cellForItemAt indexPath: IndexPath) -> JoGalleryCell{
         
         let cell = galleryController.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(JoGalleryCell.self), for: indexPath)
-        
-        image(assets[indexPath.item], targetSize: view.frame.size) { (image) in
-            cell.contentImageView.image = image
-        }
-        
+        cell.contentImageView.asset = assets[indexPath.item]
         return cell
     }
     
@@ -119,9 +115,7 @@ extension JoPhotosViewController: UICollectionViewDataSource, UICollectionViewDe
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(JoPhotosViewCellCollectionViewCell.self), for: indexPath) as! JoPhotosViewCellCollectionViewCell
-        image(assets[indexPath.item], targetSize: cell.frame.size) { (image) in
-            cell.imageView.image = image
-        }
+        cell.asset = assets[indexPath.item]
         return cell
     }
 }
@@ -143,7 +137,7 @@ extension JoPhotosViewController {
         }
     }
     
-    fileprivate func image(_ asset: PHAsset, targetSize: CGSize,  resultHandler: @escaping (UIImage?) -> Swift.Void) {
+    class func image(_ asset: PHAsset, targetSize: CGSize,  resultHandler: @escaping (UIImage?) -> Swift.Void) {
         let scale = UIScreen.main.scale
         let itemSize = CGSize.init(width: scale * targetSize.width, height: scale * targetSize.height)
         let requetOptions = PHImageRequestOptions()

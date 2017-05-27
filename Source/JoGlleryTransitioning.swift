@@ -20,6 +20,9 @@ class JoGlleryTransitioning: NSObject {
     fileprivate weak var presented: UIViewController?
     fileprivate weak var presenting: UIViewController?
     fileprivate weak var dismissed: UIViewController?
+    
+    fileprivate var presentedImage: UIImage?
+    fileprivate var dismissedImage: UIImage?
 }
 
 extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewControllerAnimatedTransitioning {
@@ -58,11 +61,15 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         }
         
         if let _ = presented, let _ = presenting, let parentLocationAttributes = parentLocationAttributes, let parentTransitionAttributes = parentTransitionAttributes {
-            presentOfAnimateTransition(using: transitionContext, fromVC: fromViewController, toVC: toViewController, location: parentLocationAttributes, transition: parentTransitionAttributes)
-            
+            JoGalleryKit.default.image(parentLocationAttributes.content, resultHandler: { (image) in
+                self.presentedImage = image
+                self.presentOfAnimateTransition(using: transitionContext, fromVC: fromViewController, toVC: toViewController, location: parentLocationAttributes, transition: parentTransitionAttributes)
+            })
         } else if let _ = dismissed, let dismissLocationAttributes = dismissLocationAttributes, let dismissTransitionAttributes = dismissTransitionAttributes {
-            dismissOfAnimateTransition(using: transitionContext, fromVC: fromViewController, toVC: toViewController, location: dismissLocationAttributes, transition: dismissTransitionAttributes)
-            
+            JoGalleryKit.default.image(dismissLocationAttributes.content, resultHandler: { (image) in
+                self.dismissedImage = image
+                self.dismissOfAnimateTransition(using: transitionContext, fromVC: fromViewController, toVC: toViewController, location: dismissLocationAttributes, transition: dismissTransitionAttributes)
+            })
         } else {
             transitionContext.completeTransition(true)
         }
@@ -95,9 +102,9 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         transitionContext.completeTransition(true)
         keyWindow.insertSubview(fromView, belowSubview: containerView)
         
-        let tem = addNavigationBarMaskView(fromVC, containerView: containerView)
-        let presentedView = tem.lastView
-        let navigationMaskView = tem.navigationMaskView
+        let temp = addNavigationBarMaskView(fromVC, containerView: containerView)
+        let presentedView = temp.lastView
+        let navigationMaskView = temp.navigationMaskView
         toView.isHidden = true
         navigationMaskView?.alpha = 0
         
@@ -110,12 +117,8 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
             imageView.clipsToBounds = location.location.clipsToBounds
             imageView.layer.masksToBounds = location.location.layer.masksToBounds
             imageView.contentMode = location.location.contentMode
-            
-            JoGalleryKit.image(location.content, resultHandler: { (image) in
-                imageView.image = image
-            })
-            
             imageView.frame = location.location.convert(location.location.bounds, to: fromView)
+            imageView.image = presentedImage
             
             presentedView.addSubview(maskView)
             presentedView.addSubview(imageView)
@@ -160,14 +163,10 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
             imageView.clipsToBounds = location.location.clipsToBounds
             imageView.layer.masksToBounds = location.location.layer.masksToBounds
             imageView.contentMode = location.location.contentMode
-            
-            JoGalleryKit.image(location.content, resultHandler: { (image) in
-                imageView.image = image
-            })
-            
             imageView.frame.size = transition.size
             imageView.center = transition.center
             imageView.transform = transition.transform
+            imageView.image = dismissedImage
             
             presentedView.addSubview(maskView)
             presentedView.addSubview(imageView)

@@ -7,9 +7,11 @@
 //
 
 import UIKit
+import Photos
 
 class JoPhotosViewCellCollectionViewCell: UICollectionViewCell {
     let imageView = UIImageView()
+    let loadImageQueue = OperationQueue()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -19,6 +21,18 @@ class JoPhotosViewCellCollectionViewCell: UICollectionViewCell {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    open var asset: PHAsset? {
+        didSet {
+            loadImageQueue.cancelAllOperations()
+            imageView.image = nil
+            loadImageQueue.addOperation {
+                JoPhotosViewController.image(self.asset!, targetSize: self.frame.size, resultHandler: { (image) in
+                    self.imageView.image = image
+                })
+            }
+        }
     }
     
 }

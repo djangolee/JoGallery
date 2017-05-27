@@ -59,6 +59,10 @@ open class JoGalleryController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        JoGalleryKit.default.cache.removeAllObjects()
+    }
+    
     // MARK: Self.view life cycle
     
     override open func viewDidLoad() {
@@ -120,24 +124,29 @@ extension JoGalleryController {
     open func reloadData() {
         collectionView.reloadData()
     }
-
+    
     open func present(from viewControllerFromParent: UIViewController, toItem: IndexPath, completion: (() -> Swift.Void)? = nil) {
+        if let delegate = delegate, let location = delegate.presentForTransitioning(in: self, openAt: toItem) {
+            transitioning.parentLocationAttributes = location
+            transitioning.parentTransitionAttributes = JoGalleryImageView.imageAttributes(location.content)
+        } else {
+            transitioning.parentLocationAttributes = nil;
+            transitioning.parentTransitionAttributes = nil
+        }
         
         isStatusBarHidden = viewControllerFromParent.prefersStatusBarHidden
         fromParent = viewControllerFromParent
         _currentIndexPath = toItem
         adjustScrollToItem(to: toItem)
         
-        setParentLocationAttributes(toItem) { 
-            viewControllerFromParent.present(self, animated: true) {
-                if let completion = completion {
-                    completion()
-                }
-                if let delegate = self.delegate {
-                    delegate.presentTransitionCompletion(in: self, openAt: toItem)
-                }
-                self.setNeedsStatusBarAppearanceUpdate()
+        viewControllerFromParent.present(self, animated: true) {
+            if let completion = completion {
+                completion()
             }
+            if let delegate = self.delegate {
+                delegate.presentTransitionCompletion(in: self, openAt: toItem)
+            }
+            self.setNeedsStatusBarAppearanceUpdate()
         }
     }
     
@@ -161,26 +170,6 @@ extension JoGalleryController {
         }
     }
     
-    private func setParentLocationAttributes(_ toItem: IndexPath, completion: @escaping () -> Swift.Void) {
-        if let delegate = delegate, let location = delegate.presentForTransitioning(in: self, openAt: toItem) {
-            let size = collectionView(collectionView, layout: collectionView.collectionViewLayout, sizeForItemAt: toItem)
-            JoGalleryKit.image(location.content, resultHandler: { (image) in
-                if let image = image {
-                    self.transitioning.parentLocationAttributes = location
-                    self.transitioning.parentTransitionAttributes = JoGalleryImageView.imageAttributes(image, with: size)
-                    completion()
-                } else {
-                    self.transitioning.parentLocationAttributes = nil;
-                    self.transitioning.parentTransitionAttributes = nil
-                    completion()
-                }
-            })
-        } else {
-            transitioning.parentLocationAttributes = nil;
-            transitioning.parentTransitionAttributes = nil
-            completion()
-        }
-    }
 }
 
 // MARK: JoGalleryImageViewDelegate
