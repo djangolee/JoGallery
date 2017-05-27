@@ -38,7 +38,7 @@ public protocol JoGalleryDelegate: NSObjectProtocol {
     func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath) -> UIView?
     func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat)
     func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat) -> UIView?
-    
+
 }
 
 extension JoGalleryDelegate {

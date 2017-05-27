@@ -171,7 +171,6 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
         case .changed:
             if isRotating {
                 if sender.numberOfTouches >= 2 {
-                    
                     scrollView.transform = view.transform.rotated(by: sender.rotation)
                     adjustImageCenter()
                 } else {
@@ -273,7 +272,7 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
         }
     }
     
-    fileprivate func scrollViewZoomChangState(_ state: UIGestureRecognizerState) {
+    @objc fileprivate func scrollViewZoomChangState(_ state: UIGestureRecognizerState) {
         switch state {
         case .possible, .began:
             isZooming = true
@@ -326,6 +325,10 @@ extension JoGalleryImageView {
     
     fileprivate func addObserver(_ gestureRecognizer: UIGestureRecognizer?) {
         gestureRecognizer?.addObserver(self, forKeyPath: #keyPath(UIGestureRecognizer.state), options: .new, context: nil)
+        if let gestureRecognizer = gestureRecognizer {
+            isZooming = true
+            scrollViewZoomChangState(gestureRecognizer.state)
+        }
     }
     
     fileprivate func removeObserver(_ gestureRecognizer: UIGestureRecognizer?) {
@@ -407,6 +410,7 @@ extension JoGalleryImageView: UIScrollViewDelegate {
     }
     
     func endTouch() {
+        
         if isZooming || isDragging || isRotating || isScrolling, isTouching {
             if let delegate = delegate {
                 delegate.galleryImageViewWillEndTouch(self)

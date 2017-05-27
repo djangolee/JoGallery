@@ -205,25 +205,30 @@ extension JoGalleryController: JoGalleryImageViewDelegate {
     
     private func galleryDidTransforming(_ galleryImageView: JoGalleryImageView, didEnd: Bool = false) {
         var zoomScale: CGFloat = 0
-        if galleryImageView.zoomScale >= 1 {
-            zoomScale = 1
-        } else if (galleryImageView.zoomScale < closeZoomThresholdValue) {
-            zoomScale = 0
-        } else {
-            zoomScale = (galleryImageView.zoomScale - closeZoomThresholdValue) / (1 - closeZoomThresholdValue)
-        }
-        
         var scrollScale: CGFloat = 0
-        if galleryImageView.offset.equalTo(CGPoint.zero) {
+        
+        if didEnd {
+            zoomScale = 1
             scrollScale = 1
-        } else if (closeScrollThresholdValue < fabs(galleryImageView.offset.y)) {
-            scrollScale = 0
         } else {
-            scrollScale = (closeScrollThresholdValue - fabs(galleryImageView.offset.y)) / closeScrollThresholdValue
+            if galleryImageView.zoomScale >= 1 {
+                zoomScale = 1
+            } else if (galleryImageView.zoomScale < closeZoomThresholdValue) {
+                zoomScale = 0
+            } else {
+                zoomScale = (galleryImageView.zoomScale - closeZoomThresholdValue) / (1 - closeZoomThresholdValue)
+            }
+            if galleryImageView.offset.equalTo(CGPoint.zero) {
+                scrollScale = 1
+            } else if (closeScrollThresholdValue < fabs(galleryImageView.offset.y)) {
+                scrollScale = 0
+            } else {
+                scrollScale = (closeScrollThresholdValue - fabs(galleryImageView.offset.y)) / closeScrollThresholdValue
+            }
         }
         
         if self.backgroundView.alpha != min(zoomScale, scrollScale) {
-            UIView.animate(withDuration: 0.25, animations: { 
+            UIView.animate(withDuration: 0.25, animations: {
                 self.backgroundView.alpha = min(zoomScale, scrollScale)
                 self.setNeedsStatusBarAppearanceUpdate()
             }, completion: { (completion) in
@@ -232,6 +237,7 @@ extension JoGalleryController: JoGalleryImageViewDelegate {
                 }
             })
         }
+    
         
         if let delegate = self.delegate, !didEnd {
             delegate.galleryDidTransforming(in: self, atIndex: self.currentIndexPath, isTouching: galleryImageView.isTouching, with: self.backgroundView.alpha)
@@ -278,6 +284,7 @@ extension JoGalleryController: UICollectionViewDelegateFlowLayout, UICollectionV
         if let indexPath = currentIndexPathsForFullVisible(), indexPath != _currentIndexPath {
             let oldItem = _currentIndexPath
             _currentIndexPath = indexPath
+            
             if let delegate = delegate, let cell = collectionView.cellForItem(at: currentIndexPath) as? JoGalleryCell {
                 delegate.gallery(self, scrolDidDisplay: cell, forItemAt: currentIndexPath, oldItemFrom: oldItem)
             }
