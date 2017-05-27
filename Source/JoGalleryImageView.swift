@@ -69,7 +69,7 @@ public class JoGalleryImageView: UIView {
     
     // MARK: Life cycle
     
-    override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         isRotating = false
         isDragging = false
         isZooming = false

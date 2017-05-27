@@ -25,7 +25,7 @@ open class JoGalleryCell: UICollectionViewCell {
     
     // MARK: Life cycle
     
-    override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         super.init(frame: frame)
         setup()
     }
@@ -64,8 +64,6 @@ open class JoGalleryCell: UICollectionViewCell {
 // MARK: About Observer
 
 extension JoGalleryCell {
-    
-    static let contentOffsetKeyPath: String = "contentOffset"
     
     fileprivate func addObserver(_ scrollView: UIScrollView?) {
         scrollView?.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset), options: .new, context: nil)
