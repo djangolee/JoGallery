@@ -71,7 +71,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
                 self.dismissOfAnimateTransition(using: transitionContext, fromVC: fromViewController, toVC: toViewController, location: dismissLocationAttributes, transition: dismissTransitionAttributes)
             })
         } else {
-            transitionContext.completeTransition(true)
+            noneTransitionOfAnimateTransition(using: transitionContext)
         }
     }
     
@@ -94,7 +94,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
     private func presentOfAnimateTransition(using transitionContext: UIViewControllerContextTransitioning, fromVC: UIViewController, toVC: UIViewController, location: JoGalleryDelegate.JoGalleryLocationAttributes, transition: UICollectionViewLayoutAttributes) {
         
         guard  let fromView = fromVC.view, let toView = toVC.view, let keyWindow = UIApplication.shared.keyWindow else {
-            transitionContext.completeTransition(true)
+            noneTransitionOfAnimateTransition(using: transitionContext)
             return
         }
         let containerView = transitionContext.containerView
@@ -145,7 +145,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
     private func dismissOfAnimateTransition(using transitionContext: UIViewControllerContextTransitioning, fromVC: UIViewController, toVC: UIViewController, location: JoGalleryDelegate.JoGalleryLocationAttributes, transition: UICollectionViewLayoutAttributes) {
         
         guard  let fromView = fromVC.view, let toView = toVC.view else {
-            transitionContext.completeTransition(true)
+            noneTransitionOfAnimateTransition(using: transitionContext)
             return
         }
         
