@@ -172,8 +172,8 @@ extension JoPhotosViewController {
             if status == .authorized {
                 let fetchOptions = PHFetchOptions()
                 fetchOptions.sortDescriptors = [NSSortDescriptor(key: #keyPath(PHAsset.creationDate), ascending: true)]
-                self.assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
                 OperationQueue.main.addOperation {
+                    self.assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
                     self.collectionView.reloadData()
                 }
             }

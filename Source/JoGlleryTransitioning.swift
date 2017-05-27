@@ -43,7 +43,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         return self
     }
     
-    static let transitionDuration: TimeInterval = 0.25
+    static let transitionDuration: TimeInterval = 0.35
     
     // MARK: UIViewControllerAnimatedTransitioning
     
@@ -125,7 +125,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
 
             location.location.isHidden = true
             
-            UIView.animate(withDuration: 0.25, animations: { 
+            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.1, options: .curveLinear, animations: {
                 imageView.bounds.size = transition.size
                 imageView.center = transition.center
                 maskView.alpha = 1
@@ -173,7 +173,8 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
             
             fromView.isHidden = true
             location.location.isHidden = true
-            UIView.animate(withDuration: 0.25, animations: {
+            
+            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.1, options: .curveLinear, animations: {
                 maskView.alpha = 0
                 navigationMaskView?.alpha = 0
                 imageView.transform = location.location.transform

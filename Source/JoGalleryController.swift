@@ -50,7 +50,7 @@ open class JoGalleryController: UIViewController {
         transitioning = JoGlleryTransitioning()
         closeZoomThresholdValue = 0.75
         closeScrollThresholdValue = 100
-        isStatusBarHidden = true
+        isStatusBarHidden = false
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         self.transitioningDelegate = transitioning
     }
@@ -134,7 +134,6 @@ extension JoGalleryController {
             transitioning.parentTransitionAttributes = nil
         }
         
-        isStatusBarHidden = viewControllerFromParent.prefersStatusBarHidden
         fromParent = viewControllerFromParent
         _currentIndexPath = toItem
         adjustScrollToItem(to: toItem)

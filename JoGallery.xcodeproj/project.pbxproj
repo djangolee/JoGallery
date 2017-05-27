@@ -58,8 +58,8 @@
 		D8B224C71ED7009D0058C7C2 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				D8B224DD1ED707EB0058C7C2 /* JoGalleryCell.swift */,
 				D8B224DE1ED707EB0058C7C2 /* JoGalleryController.swift */,
+				D8B224DD1ED707EB0058C7C2 /* JoGalleryCell.swift */,
 				D8B224DF1ED707EB0058C7C2 /* JoGalleryImageView.swift */,
 				D8B224E01ED707EB0058C7C2 /* JoGalleryProtocol.swift */,
 				D8B224E11ED707EB0058C7C2 /* JoGlleryTransitioning.swift */,
