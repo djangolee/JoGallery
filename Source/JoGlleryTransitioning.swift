@@ -129,7 +129,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
                 maskView.alpha = 1
                 navigationMaskView?.alpha = 1
             })
-            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 15, options: .curveLinear, animations: {
+            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: .curveLinear, animations: {
                 imageView.bounds.size = transition.size
                 imageView.center = transition.center
             }, completion: { (completion) in
@@ -181,7 +181,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
                 navigationMaskView?.alpha = 0
             })
             
-            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.1, options: .curveLinear, animations: {
+            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: .curveLinear, animations: {
                 imageView.transform = location.location.transform
                 imageView.frame = location.location.convert(location.location.bounds, to: toView)
             }, completion: { (completion) in
