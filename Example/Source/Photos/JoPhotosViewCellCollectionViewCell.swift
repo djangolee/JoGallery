@@ -26,7 +26,6 @@ class JoPhotosViewCellCollectionViewCell: UICollectionViewCell {
     open var asset: PHAsset? {
         didSet {
             loadImageQueue.cancelAllOperations()
-            imageView.image = nil
             loadImageQueue.addOperation {
                 JoPhotosViewController.image(self.asset!, targetSize: self.frame.size, resultHandler: { (image) in
                     self.imageView.image = image

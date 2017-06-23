@@ -39,10 +39,9 @@ public class JoGalleryImageView: UIView {
     open var asset: PHAsset? {
         didSet {
             loadImageQueue.cancelAllOperations()
-            self.updateImage(nil)
             loadImageQueue.addOperation {
                 JoGalleryKit.default.image(self.asset) { (image) in
-                    self.updateImage(image)
+                    self.image = image
                 }
             }
         }
