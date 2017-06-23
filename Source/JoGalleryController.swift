@@ -371,6 +371,8 @@ extension JoGalleryController {
         collectionView.dataSource = self
         collectionView.isPagingEnabled = true
         collectionView.bounces = true
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
         view.addSubview(collectionView)
     }
 }

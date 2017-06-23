@@ -16,10 +16,10 @@ open class JoGalleryCell: UICollectionViewCell {
     open var minimumLineSpacing: CGFloat = 0
     
     fileprivate var layoutCenterX: NSLayoutConstraint?
-    fileprivate weak var collectionView: UICollectionView? {
-        didSet {
-            removeObserver(oldValue)
-            addObserver(collectionView)
+    fileprivate var collectionView: UICollectionView? {
+        willSet {
+            removeObserver(collectionView)
+            addObserver(newValue)
         }
     }
     
@@ -34,15 +34,14 @@ open class JoGalleryCell: UICollectionViewCell {
         removeObserver(collectionView)
     }
     
-    override open func didMoveToSuperview() {
-        super.didMoveToSuperview()
+    open override func didMoveToWindow() {
+        super.didMoveToWindow()
         
         var next: UIResponder? = nil
-        if let superview = superview {
+        if let superview = superview, window != nil {
             next = superview
             while true {
                 if next is UICollectionView {
-                    next = nil
                     break
                 } else if next == nil {
                     break
