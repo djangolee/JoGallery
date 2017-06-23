@@ -126,12 +126,11 @@ extension JoGalleryCell {
     
     private func bindingSubviewsLayout() {
         contentImageView.translatesAutoresizingMaskIntoConstraints = false
-        let centerX = NSLayoutConstraint(item: contentImageView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
-        let centerY = NSLayoutConstraint(item: contentImageView, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0)
-        let width = NSLayoutConstraint(item: contentImageView, attribute: .width, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 1, constant: 0)
-        let height = NSLayoutConstraint(item: contentImageView, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1, constant: 0)
-        layoutCenterX = centerX
-        addConstraints([centerX, centerY, width, height])
+        layoutCenterX = NSLayoutConstraint(item: contentImageView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
+        NSLayoutConstraint(item: contentImageView, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: contentImageView, attribute: .width, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: contentImageView, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1, constant: 0).isActive = true
+        layoutCenterX?.isActive = true
     }
     
     private func setupContentImageView() {

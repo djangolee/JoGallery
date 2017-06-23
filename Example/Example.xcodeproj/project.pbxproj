@@ -12,9 +12,9 @@
 		D8B2248B1ED6FC790058C7C2 /* JoAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B2248A1ED6FC790058C7C2 /* JoAppDelegate.swift */; };
 		D8B2248E1ED6FD0D0058C7C2 /* JoNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B2248C1ED6FD0D0058C7C2 /* JoNavigationController.swift */; };
 		D8B2248F1ED6FD0D0058C7C2 /* JoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B2248D1ED6FD0D0058C7C2 /* JoViewController.swift */; };
-		D8B224E81ED708DE0058C7C2 /* JoGallery.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8B224D21ED7010C0058C7C2 /* JoGallery.framework */; };
 		D8B224E91ED708DE0058C7C2 /* JoGallery.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D8B224D21ED7010C0058C7C2 /* JoGallery.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D8B224F21ED7217E0058C7C2 /* JoPhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B224F11ED7217E0058C7C2 /* JoPhotosViewController.swift */; };
+		D8C936231EFD65D200730751 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8C936221EFD65D200730751 /* Photos.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +60,7 @@
 		D8B2248D1ED6FD0D0058C7C2 /* JoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoViewController.swift; sourceTree = "<group>"; };
 		D8B224CD1ED7010C0058C7C2 /* JoGallery.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = JoGallery.xcodeproj; path = ../JoGallery.xcodeproj; sourceTree = "<group>"; };
 		D8B224F11ED7217E0058C7C2 /* JoPhotosViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoPhotosViewController.swift; sourceTree = "<group>"; };
+		D8C936221EFD65D200730751 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D8B224E81ED708DE0058C7C2 /* JoGallery.framework in Frameworks */,
+				D8C936231EFD65D200730751 /* Photos.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,6 +81,7 @@
 				D8B2247D1ED6FBCC0058C7C2 /* Source */,
 				D8B224681ED6FA610058C7C2 /* Products */,
 				D8B224CD1ED7010C0058C7C2 /* JoGallery.xcodeproj */,
+				D8C936211EFD65D100730751 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -138,6 +140,14 @@
 				D889CDA11ED83C9000262C0C /* JoPhotosViewCellCollectionViewCell.swift */,
 			);
 			path = Photos;
+			sourceTree = "<group>";
+		};
+		D8C936211EFD65D100730751 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D8C936221EFD65D200730751 /* Photos.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
