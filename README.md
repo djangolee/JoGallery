@@ -5,7 +5,7 @@ JoGallery
 [![Build Status](https://travis-ci.org/djangolee/JoGallery.svg?branch=master)](https://travis-ci.org/djangolee/JoGallery)
 [![CocoaPods](https://img.shields.io/cocoapods/v/JoGallery.svg)](http://cocoapods.org/?q=JoGallery)
 [![Support](https://img.shields.io/badge/support-iOS8-blue.svg?style=flat)](https://www.apple.com/nl/ios/)
-[![Language](https://img.shields.io/badge/language-Swift3.1-orange.svg)](https://swift.org/)
+[![Language](https://img.shields.io/badge/language-Swift3.2-orange.svg)](https://swift.org/)
 
 Example Project
 ==============
