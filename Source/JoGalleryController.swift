@@ -32,7 +32,7 @@ open class JoGalleryController: UIViewController {
     weak open var dataSource: JoGalleryDataSource?
     
     fileprivate weak var fromParent: UIViewController?
-    fileprivate var isStatusBarHidden: Bool
+    
     fileprivate let transitioning: JoGlleryTransitioning
     fileprivate let collectionView: UICollectionView = {
         let flowLayout = UICollectionViewFlowLayout()
@@ -50,7 +50,6 @@ open class JoGalleryController: UIViewController {
         transitioning = JoGlleryTransitioning()
         closeZoomThresholdValue = 0.75
         closeScrollThresholdValue = 100
-        isStatusBarHidden = false
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         self.transitioningDelegate = transitioning
     }
@@ -78,19 +77,6 @@ open class JoGalleryController: UIViewController {
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         adjustScrollToItem(to: currentIndexPath)
-    }
-    
-    override open func setNeedsStatusBarAppearanceUpdate() {
-        if self.backgroundView.alpha < 0.9 {
-            self.isStatusBarHidden = self.fromParent?.prefersStatusBarHidden ?? self.isStatusBarHidden
-        } else {
-            self.isStatusBarHidden = true
-        }
-        super.setNeedsStatusBarAppearanceUpdate()
-    }
-    
-    override open var prefersStatusBarHidden: Bool {
-        return isStatusBarHidden
     }
     
     override open var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
@@ -145,7 +131,6 @@ extension JoGalleryController {
             if let delegate = self.delegate {
                 delegate.presentTransitionCompletion(in: self, openAt: toItem)
             }
-            self.setNeedsStatusBarAppearanceUpdate()
         }
     }
     
@@ -230,7 +215,6 @@ extension JoGalleryController: JoGalleryImageViewDelegate {
         if self.backgroundView.alpha != min(zoomScale, scrollScale) {
             UIView.animate(withDuration: 0.25, animations: {
                 self.backgroundView.alpha = min(zoomScale, scrollScale)
-                self.setNeedsStatusBarAppearanceUpdate()
             }, completion: { (completion) in
                 if let delegate = self.delegate, let view = delegate.galleryDidEndTransforming(in: self, atIndex: self.currentIndexPath, with: self.backgroundView.alpha), didEnd {
                     view.isHidden = false
