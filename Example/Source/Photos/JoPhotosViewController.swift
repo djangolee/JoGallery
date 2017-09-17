@@ -27,71 +27,48 @@ class JoPhotosViewController: UIViewController {
     }
 }
 
+// MARK: Protocol
 
-// MARK: JoGalleryDataSource, JoGalleryDelegate
-
-extension JoPhotosViewController: JoGalleryDataSource, JoGalleryDelegate {
+extension JoPhotosViewController: JoGalleryControllerAnimatedTransitioning {
     
-    // MARK: JoGalleryDataSource
+    func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath) -> TimeInterval {
+        return 1
+    }
     
-    func galleryController(_ galleryController: JoGalleryController, numberOfItemsInSection section: Int) -> Int {
+    func animateTransition(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath) {
         
-        return assets.count;
-    }
-    
-    func galleryController(_ galleryController: JoGalleryController, cellForItemAt indexPath: IndexPath) -> JoGalleryCell{
+        transitionContext.completeTransition(true)
         
-        let cell = galleryController.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(JoGalleryCell.self), for: indexPath)
-        cell.contentImageView.asset = assets[indexPath.item]
-        return cell
-    }
-    
-    // MARK: JoGalleryDelegate
-    
-    func presentForTransitioning(in galleryController: JoGalleryController, openAt indexPath: IndexPath) -> JoGalleryLocationAttributes? {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? JoPhotosViewCellCollectionViewCell else {
-            return nil
-        }
-        return (cell.imageView, assets[indexPath.item])
-    }
-    
-    func presentTransitionCompletion(in galleryController: JoGalleryController, openAt indexPath: IndexPath) {
-        
-    }
-    
-    func dismissForTransitioning(in galleryController: JoGalleryController, closeAt indexPath: IndexPath) -> JoGalleryLocationAttributes? {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? JoPhotosViewCellCollectionViewCell else {
-            return nil
-        }
-        return (cell.imageView, assets[indexPath.item])
-    }
-    
-    func dismissTransitionCompletion(in galleryController: JoGalleryController, closeAt indexPath: IndexPath) {
-        
-    }
-    
-    func gallery(_ galleryController: JoGalleryController, scrolDidDisplay cell: JoGalleryCell, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath) {
-        collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-    }
-    
-    func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath) -> UIView? {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? JoPhotosViewCellCollectionViewCell else {
-            return nil
-        }
-        return cell.imageView
-    }
-    
-    func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat) {
-        
-    }
-    
-    func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat) -> UIView? {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? JoPhotosViewCellCollectionViewCell else {
-            return nil
-        }
-        return cell.imageView
     }
 }
+
+extension JoPhotosViewController: JoGalleryDelegate {
+    
+    func gallery(_ galleryController: JoGalleryController, cellSizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: assets[indexPath.item].pixelWidth, height: assets[indexPath.item].pixelHeight)
+    }
+}
+
+extension JoPhotosViewController: JoGalleryDataSource {
+    
+    func galleryController(_ galleryController: JoGalleryController, numberOfItemsInSection section: Int) -> Int {
+        return assets.count
+    }
+    
+    func galleryController(_ galleryController: JoGalleryController, cellForItemAt indexPath: IndexPath) -> JoGalleryCell {
+        let cell = galleryController.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(JoGalleryCell.self), for: indexPath)
+        
+        let asset = assets[indexPath.item]
+        JoPhotosViewController.image(asset, targetSize: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
+            if let imageView = cell.containAnimateView as? UIImageView {
+                imageView.image = image
+            }
+        }
+        
+        return cell
+    }
+}
+
 
 // MARK: UICollectionViewProtocol
 
@@ -104,6 +81,7 @@ extension JoPhotosViewController: UICollectionViewDataSource, UICollectionViewDe
         controller.register(JoGalleryCell.self, forCellWithReuseIdentifier: NSStringFromClass(JoGalleryCell.self))
         controller.delegate = self
         controller.dataSource = self
+        controller.transitioningAnimate = self
         controller.present(from: self, toItem: indexPath)
     }
     
@@ -141,7 +119,7 @@ extension JoPhotosViewController {
         let scale = UIScreen.main.scale
         let itemSize = CGSize.init(width: scale * targetSize.width, height: scale * targetSize.height)
         let requetOptions = PHImageRequestOptions()
-        requetOptions.resizeMode = .fast
+        requetOptions.resizeMode = .none
         requetOptions.isSynchronous = false
         requetOptions.deliveryMode = .highQualityFormat
         
@@ -158,13 +136,8 @@ extension JoPhotosViewController {
 extension JoPhotosViewController {
     
     fileprivate func setup() {
-        setupVariable()
         setupUI()
         prepareLaunch()
-    }
-    
-    private func setupVariable() {
-        
     }
     
     private func prepareLaunch() {

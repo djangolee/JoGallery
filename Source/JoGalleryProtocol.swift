@@ -12,10 +12,10 @@ import UIKit
 
 public protocol JoGalleryDataSource: NSObjectProtocol {
     
+    func numberOfSections(in galleryController: JoGalleryController) -> Int
+    
     func galleryController(_ galleryController: JoGalleryController, numberOfItemsInSection section: Int) -> Int
     func galleryController(_ galleryController: JoGalleryController, cellForItemAt indexPath: IndexPath) -> JoGalleryCell
-    
-    func numberOfSections(in galleryController: JoGalleryController) -> Int
 }
 
 extension JoGalleryDataSource {
@@ -26,78 +26,62 @@ extension JoGalleryDataSource {
 
 public protocol JoGalleryDelegate: NSObjectProtocol {
     
-    typealias JoGalleryLocationAttributes = (location: UIView, content: Any)
-    
-    func presentForTransitioning(in galleryController: JoGalleryController, openAt indexPath: IndexPath) -> JoGalleryLocationAttributes?
-    func presentTransitionCompletion(in galleryController: JoGalleryController, openAt indexPath: IndexPath)
-    func dismissForTransitioning(in galleryController: JoGalleryController, closeAt indexPath: IndexPath) -> JoGalleryLocationAttributes?
-    func dismissTransitionCompletion(in galleryController: JoGalleryController, closeAt indexPath: IndexPath)
-    
+    func gallery(_ galleryController: JoGalleryController, cellSizeForItemAt indexPath: IndexPath) -> CGSize
     func gallery(_ galleryController: JoGalleryController, scrolDidDisplay cell: JoGalleryCell, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath)
-    
-    func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath) -> UIView?
-    func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat)
-    func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat) -> UIView?
 
+    func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath)
+    func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat)
+    func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat)
+    
 }
 
 extension JoGalleryDelegate {
     
-    public func presentForTransitioning(in galleryController: JoGalleryController, openAt indexPath: IndexPath) -> JoGalleryLocationAttributes? {
-        return nil
-    }
+    public func gallery(_ galleryController: JoGalleryController, scrolDidDisplay cell: JoGalleryCell, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath) { }
     
-    public func presentTransitionCompletion(in galleryController: JoGalleryController, openAt indexPath: IndexPath) {
-        
-    }
+    public func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath) { }
+    public func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat) { }
+    public func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat) { }
+}
+
+// MARK: AnimatedTransitioning
+
+public protocol JoGalleryControllerAnimatedTransitioning : NSObjectProtocol {
+ 
+    func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath) -> TimeInterval
     
-    public func dismissForTransitioning(in galleryController: JoGalleryController, closeAt indexPath: IndexPath) -> JoGalleryLocationAttributes? {
-        return nil
-    }
+    func animateTransition(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath)
+}
+
+extension JoGalleryControllerAnimatedTransitioning {
     
-    public func dismissTransitionCompletion(in galleryController: JoGalleryController, closeAt indexPath: IndexPath) {
-        
-    }
-    
-    public func gallery(_ galleryController: JoGalleryController, scrolDidDisplay cell: JoGalleryCell, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath) {
-        
-    }
-    
-    public func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath) -> UIView? {
-        return nil
-    }
-    
-    public func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat) {
-        
-    }
-    
-    public func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat) -> UIView? {
-        return nil
+    func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath) -> TimeInterval {
+        return 0.25
     }
 }
 
-// MARK: JoGalleryImageView
+// MARK: JoGalleryItemView
 
-public protocol JoGalleryImageViewDelegate: NSObjectProtocol {
+public protocol JoGalleryItemViewDelegate: NSObjectProtocol {
     
-    func galleryImageViewDidClick(_ galleryImageView: JoGalleryImageView)
-    func galleryImageViewDidLongPress(_ galleryImageView: JoGalleryImageView)
-    func galleryImageViewDidScroll(_ galleryImageView: JoGalleryImageView)
-    func galleryImageViewDidZoom(_ galleryImageView: JoGalleryImageView)
-    func galleryImageViewDidRotation(_ galleryImageView: JoGalleryImageView)
-    func galleryImageViewBeginTouching(_ galleryImageView: JoGalleryImageView)
-    func galleryImageViewWillEndTouch(_ galleryImageView: JoGalleryImageView)
-    func galleryImageViewDidEndTouch(_ galleryImageView: JoGalleryImageView)
+    func galleryItemViewDidClick(_ galleryItemView: JoGalleryItemView)
+    func galleryItemViewDidLongPress(_ galleryItemView: JoGalleryItemView)
+    func galleryItemViewDidScroll(_ galleryItemView: JoGalleryItemView)
+    func galleryItemViewDidZoom(_ galleryItemView: JoGalleryItemView)
+    func galleryItemViewDidRotation(_ galleryItemView: JoGalleryItemView)
+    func galleryItemViewBeginTouching(_ galleryItemView: JoGalleryItemView)
+    func galleryItemViewWillEndTouch(_ galleryItemView: JoGalleryItemView)
+    func galleryItemViewDidEndTouch(_ galleryItemView: JoGalleryItemView)
 }
 
-extension JoGalleryImageViewDelegate {
+extension JoGalleryItemViewDelegate {
     
-    public func galleryImageViewDidClick(_ galleryImageView: JoGalleryImageView) { }
-    public func galleryImageViewDidLongPress(_ galleryImageView: JoGalleryImageView) { }
-    public func galleryImageViewDidScroll(_ galleryImageView: JoGalleryImageView) { }
-    public func galleryImageViewDidZoom(_ galleryImageView: JoGalleryImageView) { }
-    public func galleryImageViewDidRotation(_ galleryImageView: JoGalleryImageView) { }
-    public func galleryImageViewBeginTouching(_ galleryImageView: JoGalleryImageView) { }
-    public func galleryImageViewWillEndTouch(_ galleryImageView: JoGalleryImageView) { }
-    public func galleryImageViewDidEndTouch(_ galleryImageView: JoGalleryImageView) { }
+    public func galleryItemViewDidClick(_ galleryItemView: JoGalleryItemView) { }
+    public func galleryItemViewDidLongPress(_ galleryItemView: JoGalleryItemView) { }
+    public func galleryItemViewDidScroll(_ galleryItemView: JoGalleryItemView) { }
+    public func galleryItemViewDidZoom(_ galleryItemView: JoGalleryItemView) { }
+    public func galleryItemViewDidRotation(_ galleryItemView: JoGalleryItemView) { }
+    public func galleryItemViewBeginTouching(_ galleryItemView: JoGalleryItemView) { }
+    public func galleryItemViewWillEndTouch(_ galleryItemView: JoGalleryItemView) { }
+    public func galleryItemViewDidEndTouch(_ galleryItemView: JoGalleryItemView) { }
 }

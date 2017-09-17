@@ -27,13 +27,21 @@ open class JoGalleryController: UIViewController {
     open var backgroundView: UIView = UIView()
     open var closeZoomThresholdValue: CGFloat
     open var closeScrollThresholdValue: CGFloat
+    open var maximumBodyOriginZoomScale: CGFloat = 2
+    
+    fileprivate let transitioning: JoGlleryTransitioning
     
     weak open var delegate: JoGalleryDelegate?
     weak open var dataSource: JoGalleryDataSource?
+    weak open var transitioningAnimate: JoGalleryControllerAnimatedTransitioning? {
+        get {
+            return transitioning.transitioningDelegate
+        }
+        set {
+            transitioning.transitioningDelegate = newValue
+        }
+    }
     
-    fileprivate weak var fromParent: UIViewController?
-    
-    fileprivate let transitioning: JoGlleryTransitioning
     fileprivate let collectionView: UICollectionView = {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.minimumLineSpacing = 0
@@ -47,19 +55,15 @@ open class JoGalleryController: UIViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         _currentIndexPath = IndexPath(item: 0, section: 0)
         minimumLineSpacing = 30
-        transitioning = JoGlleryTransitioning()
         closeZoomThresholdValue = 0.75
         closeScrollThresholdValue = 100
+        transitioning = JoGlleryTransitioning()
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         self.transitioningDelegate = transitioning
     }
     
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        JoGalleryKit.default.cache.removeAllObjects()
     }
     
     // MARK: Self.view life cycle
@@ -112,83 +116,63 @@ extension JoGalleryController {
     }
     
     open func present(from viewControllerFromParent: UIViewController, toItem: IndexPath, completion: (() -> Swift.Void)? = nil) {
-        if let delegate = delegate, let location = delegate.presentForTransitioning(in: self, openAt: toItem) {
-            transitioning.parentLocationAttributes = location
-            transitioning.parentTransitionAttributes = JoGalleryImageView.imageAttributes(location.content)
-        } else {
-            transitioning.parentLocationAttributes = nil;
-            transitioning.parentTransitionAttributes = nil
-        }
-        
-        fromParent = viewControllerFromParent
         _currentIndexPath = toItem
         adjustScrollToItem(to: toItem)
         
-        viewControllerFromParent.present(self, animated: true) {
-            if let completion = completion {
-                completion()
-            }
-            if let delegate = self.delegate {
-                delegate.presentTransitionCompletion(in: self, openAt: toItem)
-            }
-        }
-    }
-    
-    open func prepareDismiss(_ galleryImageView: JoGalleryImageView, animated flag: Bool, completion: (() -> Swift.Void)? = nil) {
-        if let delegate = delegate, let location = delegate.presentForTransitioning(in: self, openAt: currentIndexPath) {
-            transitioning.dismissLocationAttributes = location
-            transitioning.dismissTransitionAttributes = galleryImageView.imageAttributes;
-            transitioning.dismissTransitionAttributes?.alpha = backgroundView.alpha;
+        if let delegate = delegate {
+            let attributes = JoGalleryItemMotionStateAttributes(delegate.gallery(self, cellSizeForItemAt: toItem))
+            transitioning.animationIndexPath(indexPath: toItem, attributes: attributes);
         } else {
-            transitioning.dismissLocationAttributes = nil
-            transitioning.dismissTransitionAttributes = nil;
+            transitioning.animationIndexPath(indexPath: nil, attributes: nil)
         }
         
-        dismiss(animated: flag) {
-            if let completion = completion {
-                completion()
-            }
-            if let delegate = self.delegate {
-                delegate.dismissTransitionCompletion(in: self, closeAt: self.currentIndexPath)
-            }
-        }
+        viewControllerFromParent.present(self, animated: true, completion: completion)
+    }
+    
+    open func prepareDismiss(_ galleryItemView: JoGalleryItemView, animated flag: Bool, completion: (() -> Swift.Void)? = nil) {
+
+        var attributes  = JoGalleryItemMotionStateAttributes(galleryItemView)
+        attributes.alpha = backgroundView.alpha
+        transitioning.animationIndexPath(indexPath: currentIndexPath, attributes: attributes)
+        
+        dismiss(animated: flag, completion: completion)
     }
     
 }
 
-// MARK: JoGalleryImageViewDelegate
+// MARK: JoGalleryItemViewDelegate
 
-extension JoGalleryController: JoGalleryImageViewDelegate {
+extension JoGalleryController: JoGalleryItemViewDelegate {
     
-    public func galleryImageViewDidClick(_ galleryImageView: JoGalleryImageView) {
-        prepareDismiss(galleryImageView, animated: true)
+    public func galleryItemViewDidClick(_ galleryItemView: JoGalleryItemView) {
+        prepareDismiss(galleryItemView, animated: true)
     }
     
-    public func galleryImageViewDidZoom(_ galleryImageView: JoGalleryImageView) {
-        galleryDidTransforming(galleryImageView)
+    public func galleryItemViewDidZoom(_ galleryItemView: JoGalleryItemView) {
+        galleryDidTransforming(galleryItemView)
     }
     
-    public func galleryImageViewDidScroll(_ galleryImageView: JoGalleryImageView) {
-        galleryDidTransforming(galleryImageView)
+    public func galleryItemViewDidScroll(_ galleryItemView: JoGalleryItemView) {
+        galleryDidTransforming(galleryItemView)
     }
     
-    public func galleryImageViewBeginTouching(_ galleryImageView: JoGalleryImageView) {
-        if let delegate = delegate, let view = delegate.galleryBeginTransforming(in: self, atIndex: currentIndexPath) {
-            view.isHidden = true
-        }
+    public func galleryItemViewBeginTouching(_ galleryItemView: JoGalleryItemView) {
+        delegate?.galleryBeginTransforming(in: self, atIndex: currentIndexPath)
     }
     
-    public func galleryImageViewWillEndTouch(_ galleryImageView: JoGalleryImageView) {
+    public func galleryItemViewWillEndTouch(_ galleryItemView: JoGalleryItemView) {
         if backgroundView.alpha <= 0 {
-            prepareDismiss(galleryImageView, animated: true)
+            prepareDismiss(galleryItemView, animated: true)
+        } else {
+            delegate?.galleryDidEndTransforming(in: self, atIndex: currentIndexPath, with: backgroundView.alpha)
         }
     }
     
-    public func galleryImageViewDidEndTouch(_ galleryImageView: JoGalleryImageView) {
-        galleryDidTransforming(galleryImageView, didEnd: true)
+    public func galleryItemViewDidEndTouch(_ galleryItemView: JoGalleryItemView) {
+        galleryDidTransforming(galleryItemView, didEnd: true)
     }
     
-    private func galleryDidTransforming(_ galleryImageView: JoGalleryImageView, didEnd: Bool = false) {
+    private func galleryDidTransforming(_ galleryItemView: JoGalleryItemView, didEnd: Bool = false) {
         var zoomScale: CGFloat = 0
         var scrollScale: CGFloat = 0
         
@@ -196,36 +180,29 @@ extension JoGalleryController: JoGalleryImageViewDelegate {
             zoomScale = 1
             scrollScale = 1
         } else {
-            if galleryImageView.zoomScale >= 1 {
+            if galleryItemView.zoomScale >= 1 {
                 zoomScale = 1
-            } else if (galleryImageView.zoomScale < closeZoomThresholdValue) {
+            } else if (galleryItemView.zoomScale < closeZoomThresholdValue) {
                 zoomScale = 0
             } else {
-                zoomScale = (galleryImageView.zoomScale - closeZoomThresholdValue) / (1 - closeZoomThresholdValue)
+                zoomScale = (galleryItemView.zoomScale - closeZoomThresholdValue) / (1 - closeZoomThresholdValue)
             }
-            if galleryImageView.offset.equalTo(CGPoint.zero) {
+            if galleryItemView.offset.equalTo(CGPoint.zero) {
                 scrollScale = 1
-            } else if (closeScrollThresholdValue < fabs(galleryImageView.offset.y)) {
+            } else if (closeScrollThresholdValue < fabs(galleryItemView.offset.y)) {
                 scrollScale = 0
             } else {
-                scrollScale = (closeScrollThresholdValue - fabs(galleryImageView.offset.y)) / closeScrollThresholdValue
+                scrollScale = (closeScrollThresholdValue - fabs(galleryItemView.offset.y)) / closeScrollThresholdValue
             }
         }
         
         if self.backgroundView.alpha != min(zoomScale, scrollScale) {
             UIView.animate(withDuration: 0.25, animations: {
                 self.backgroundView.alpha = min(zoomScale, scrollScale)
-            }, completion: { (completion) in
-                if let delegate = self.delegate, let view = delegate.galleryDidEndTransforming(in: self, atIndex: self.currentIndexPath, with: self.backgroundView.alpha), didEnd {
-                    view.isHidden = false
-                }
             })
         }
-    
         
-        if let delegate = self.delegate, !didEnd {
-            delegate.galleryDidTransforming(in: self, atIndex: self.currentIndexPath, isTouching: galleryImageView.isTouching, with: self.backgroundView.alpha)
-        }
+        delegate?.galleryDidTransforming(in: self, atIndex: currentIndexPath, isTouching: galleryItemView.isTouching, with: backgroundView.alpha)
     }
 }
 
@@ -256,7 +233,8 @@ extension JoGalleryController: UICollectionViewDelegateFlowLayout, UICollectionV
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = dataSource!.galleryController(self, cellForItemAt: indexPath)
         cell.minimumLineSpacing = minimumLineSpacing
-        cell.contentImageView.delegate = self
+        cell.containView.delegate = self
+        cell.update(maxZoomScale: maximumBodyOriginZoomScale, originSize: delegate?.gallery(self, cellSizeForItemAt: indexPath) ?? CGSize.zero)
         return cell
     }
     
