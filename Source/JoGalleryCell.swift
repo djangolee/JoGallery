@@ -12,8 +12,14 @@ open class JoGalleryCell: UICollectionViewCell {
     
     // MARK: Member variable
     
-    open let contentImageView = JoGalleryImageView()
     open var minimumLineSpacing: CGFloat = 0
+    
+    public let containView = JoGallerCellContainView()
+    public var containAnimateView: UIView {
+        get {
+            return containView.contentView
+        }
+    }
     
     fileprivate var layoutCenterX: NSLayoutConstraint?
     fileprivate var collectionView: UICollectionView? {
@@ -30,9 +36,15 @@ open class JoGalleryCell: UICollectionViewCell {
         setup()
     }
     
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     deinit {
         removeObserver(collectionView)
     }
+    
+    // MARK: Override
     
     open override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -55,8 +67,8 @@ open class JoGalleryCell: UICollectionViewCell {
         }
     }
     
-    required public init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    open func update(maxZoomScale: CGFloat, originSize: CGSize) {
+        containView.update(maxZoomScale: maxZoomScale, originSize: originSize)
     }
 }
 
@@ -107,33 +119,24 @@ extension JoGalleryCell {
 extension JoGalleryCell {
     
     fileprivate func setup() {
-        setupVariable()
-        setupUI()
-        setupVariable()
-    }
-    
-    private func setupVariable() {
-        
-    }
-    
-    private func setupUI() {
         preservesSuperviewLayoutMargins = false
         layoutMargins = .zero
         
-        setupContentImageView()
+        setupContainView()
         bindingSubviewsLayout()
+
     }
     
     private func bindingSubviewsLayout() {
-        contentImageView.translatesAutoresizingMaskIntoConstraints = false
-        layoutCenterX = NSLayoutConstraint(item: contentImageView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
-        NSLayoutConstraint(item: contentImageView, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0).isActive = true
-        NSLayoutConstraint(item: contentImageView, attribute: .width, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 1, constant: 0).isActive = true
-        NSLayoutConstraint(item: contentImageView, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1, constant: 0).isActive = true
+        containView.translatesAutoresizingMaskIntoConstraints = false
+        layoutCenterX = NSLayoutConstraint(item: containView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
+        NSLayoutConstraint(item: containView, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: containView, attribute: .width, relatedBy: .equal, toItem: self, attribute: .width, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: containView, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1, constant: 0).isActive = true
         layoutCenterX?.isActive = true
     }
     
-    private func setupContentImageView() {
-        addSubview(contentImageView)
+    private func setupContainView() {
+        contentView.addSubview(containView)
     }
 }

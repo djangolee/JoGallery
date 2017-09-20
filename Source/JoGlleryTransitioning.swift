@@ -11,18 +11,22 @@ import Photos
 
 class JoGlleryTransitioning: NSObject {
     
-    open var parentLocationAttributes: JoGalleryDelegate.JoGalleryLocationAttributes?
-    open var dismissLocationAttributes: JoGalleryDelegate.JoGalleryLocationAttributes?
+    weak var transitioningDelegate: JoGalleryControllerAnimatedTransitioning?
     
-    open var parentTransitionAttributes: UICollectionViewLayoutAttributes?
-    open var dismissTransitionAttributes: UICollectionViewLayoutAttributes?
+    var animateIndexPath: IndexPath?
+    var animateAttributes: JoGalleryItemMotionStateAttributes?
+    var context = JoGalleryControllerContextTransitioning()
     
     fileprivate weak var presented: UIViewController?
     fileprivate weak var presenting: UIViewController?
     fileprivate weak var dismissed: UIViewController?
     
-    fileprivate var presentedImage: UIImage?
-    fileprivate var dismissedImage: UIImage?
+    
+    func animationIndexPath(indexPath: IndexPath?, attributes: JoGalleryItemMotionStateAttributes?) {
+        animateIndexPath = indexPath
+        animateAttributes = attributes
+    }
+    
 }
 
 extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewControllerAnimatedTransitioning {
@@ -43,158 +47,97 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         return self
     }
     
-    static let transitionDuration: TimeInterval = 0.35
-    
     // MARK: UIViewControllerAnimatedTransitioning
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return JoGlleryTransitioning.transitionDuration
+        if let delegate = transitioningDelegate, let indexpath = animateIndexPath {
+            return delegate.transitionDuration(using: context, atIndex: indexpath)
+        } else {
+            return 0.25
+        }
     }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
 
-        guard let toViewController = transitionContext.viewController(forKey: .to),
+        guard let _ = transitioningDelegate,
+            let toViewController = transitionContext.viewController(forKey: .to),
             let fromViewController = transitionContext.viewController(forKey: .from) else {
                 
                 transitionContext.completeTransition(true)
                 return
         }
         
-        if let _ = presented, let _ = presenting, let parentLocationAttributes = parentLocationAttributes, let parentTransitionAttributes = parentTransitionAttributes {
-            JoGalleryKit.default.image(parentLocationAttributes.content, resultHandler: { (image) in
-                self.presentedImage = image
-                self.presentOfAnimateTransition(using: transitionContext, fromVC: fromViewController, toVC: toViewController, location: parentLocationAttributes, transition: parentTransitionAttributes)
-            })
-        } else if let _ = dismissed, let dismissLocationAttributes = dismissLocationAttributes, let dismissTransitionAttributes = dismissTransitionAttributes {
-            JoGalleryKit.default.image(dismissLocationAttributes.content, resultHandler: { (image) in
-                self.dismissedImage = image
-                self.dismissOfAnimateTransition(using: transitionContext, fromVC: fromViewController, toVC: toViewController, location: dismissLocationAttributes, transition: dismissTransitionAttributes)
-            })
+        if let _ = presented, let _ = presenting {
+            presentOfAnimateTransition(using: transitionContext, fromVC: fromViewController, toVC: toViewController)
+        } else if let _ = dismissed {
+            dismissOfAnimateTransition(using: transitionContext, fromVC: fromViewController, toVC: toViewController)
         } else {
             noneTransitionOfAnimateTransition(using: transitionContext)
         }
     }
     
-    func addNavigationBarMaskView(_ viewController: UIViewController, containerView: UIView) -> (lastView: UIView, navigationMaskView: UIView?) {
+    private func presentOfAnimateTransition(using transitionContext: UIViewControllerContextTransitioning, fromVC: UIViewController, toVC: UIViewController) {
         
-        if let navigationController = viewController as? UINavigationController, let lastVC = navigationController.viewControllers.last {
-            let navigationMaskView = UIView(frame: navigationController.navigationBar.frame)
-            navigationMaskView.backgroundColor = .black
-            if navigationMaskView.frame.origin.y != 0 {
-                navigationMaskView.frame.size.height = 64
-                navigationMaskView.frame.origin.y = 0
-            }
-            containerView.addSubview(navigationMaskView)
-            return (lastVC.view, navigationMaskView)
-        } else {
-            return (viewController.view, nil)
-        }
-    }
-    
-    private func presentOfAnimateTransition(using transitionContext: UIViewControllerContextTransitioning, fromVC: UIViewController, toVC: UIViewController, location: JoGalleryDelegate.JoGalleryLocationAttributes, transition: UICollectionViewLayoutAttributes) {
-        
-        guard  let fromView = fromVC.view, let toView = toVC.view, let keyWindow = UIApplication.shared.keyWindow else {
-            noneTransitionOfAnimateTransition(using: transitionContext)
-            return
+        guard let keyWindow = UIApplication.shared.keyWindow,
+            let fromView = fromVC.view,
+            let toView = toVC.view,
+            let delegate = transitioningDelegate,
+            let indexPath = animateIndexPath,
+            let attributes = animateAttributes else {
+                
+                noneTransitionOfAnimateTransition(using: transitionContext)
+                return
         }
         let containerView = transitionContext.containerView
+    
+        context.completeTransitionBlackCall = { (didComplete) in
+            self.context.completeTransitionBlackCall = nil
+            if didComplete {
+                toView.isHidden = false
+            }
+        }
+        
+        toView.isHidden = true
+        context.toView = toView
+        context.fromView = fromView
+        context.attributes = attributes
+        context.containerView = UIView()
+        context.containerView?.frame = containerView.frame
+        containerView.addSubview(context.containerView!)
+        
         containerView.addSubview(toView)
         transitionContext.completeTransition(true)
         keyWindow.insertSubview(fromView, belowSubview: containerView)
         
-        let temp = addNavigationBarMaskView(fromVC, containerView: containerView)
-        let presentedView = temp.lastView
-        let navigationMaskView = temp.navigationMaskView
-        toView.isHidden = true
-        navigationMaskView?.alpha = 0
-        
-        _ = {
-            let maskView = UIView(frame: fromView.bounds)
-            maskView.backgroundColor = .black
-            maskView.alpha = 0
-            
-            let imageView = UIImageView()
-            imageView.clipsToBounds = location.location.clipsToBounds
-            imageView.layer.masksToBounds = location.location.layer.masksToBounds
-            imageView.contentMode = location.location.contentMode
-            imageView.frame = location.location.convert(location.location.bounds, to: fromView)
-            imageView.image = presentedImage
-            
-            presentedView.addSubview(maskView)
-            presentedView.addSubview(imageView)
-
-            location.location.isHidden = true
-            
-            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, animations: { 
-                maskView.alpha = 1
-                navigationMaskView?.alpha = 1
-            })
-            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: .curveLinear, animations: {
-                imageView.bounds.size = transition.size
-                imageView.center = transition.center
-            }, completion: { (completion) in
-                toView.isHidden = false
-                location.location.isHidden = false
-                navigationMaskView?.removeFromSuperview()
-                maskView.removeFromSuperview()
-                imageView.removeFromSuperview()
-            })
-        }()
+        delegate.animateTransition(using: context, atIndex: indexPath)
     }
     
-    private func dismissOfAnimateTransition(using transitionContext: UIViewControllerContextTransitioning, fromVC: UIViewController, toVC: UIViewController, location: JoGalleryDelegate.JoGalleryLocationAttributes, transition: UICollectionViewLayoutAttributes) {
+    private func dismissOfAnimateTransition(using transitionContext: UIViewControllerContextTransitioning, fromVC: UIViewController, toVC: UIViewController) {
         
-        guard  let fromView = fromVC.view, let toView = toVC.view else {
-            noneTransitionOfAnimateTransition(using: transitionContext)
-            return
+        guard let fromView = fromVC.view,
+            let toView = toVC.view,
+            let delegate = transitioningDelegate,
+            let indexPath = animateIndexPath,
+            let attributes = animateAttributes else {
+                
+                noneTransitionOfAnimateTransition(using: transitionContext)
+                return
+        }
+        let containerView = transitionContext.containerView
+        
+        context.completeTransitionBlackCall = { (didComplete) in
+            self.context.completeTransitionBlackCall = nil
+            transitionContext.completeTransition(true)
         }
         
-        let containerView = transitionContext.containerView
-        let temp = addNavigationBarMaskView(toVC, containerView: containerView)
-        let presentedView = temp.lastView
-        let navigationMaskView = temp.navigationMaskView
-        navigationMaskView?.alpha = transition.alpha
+        context.toView = toView
+        context.fromView = fromView
+        context.attributes = attributes
+        context.containerView = UIView()
+        context.containerView?.frame = containerView.frame
+        containerView.addSubview(context.containerView!)
         
-        _ = {
-            
-            let maskView = UIView(frame: fromView.bounds)
-            maskView.backgroundColor = .black
-            maskView.alpha = transition.alpha
-            
-            let imageView = UIImageView()
-            imageView.clipsToBounds = location.location.clipsToBounds
-            imageView.layer.masksToBounds = location.location.layer.masksToBounds
-            imageView.contentMode = location.location.contentMode
-            imageView.frame.size = transition.size
-            imageView.center = transition.center
-            imageView.transform = transition.transform
-            imageView.image = dismissedImage
-            
-            presentedView.addSubview(maskView)
-            presentedView.addSubview(imageView)
-            
-            fromView.isHidden = true
-            location.location.isHidden = true
-            
-            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, animations: {
-                maskView.alpha = 0
-                navigationMaskView?.alpha = 0
-            })
-            
-            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: .curveLinear, animations: {
-                imageView.transform = location.location.transform
-                imageView.frame = location.location.convert(location.location.bounds, to: toView)
-            }, completion: { (completion) in
-                fromView.isHidden = false
-                location.location.isHidden = false
-                
-                navigationMaskView?.removeFromSuperview()
-                maskView.removeFromSuperview()
-                imageView.removeFromSuperview()
-                transitionContext.completeTransition(true)
-                self.freeResource()
-            })
-        }()
+        delegate.animateTransition(using: context, atIndex: indexPath)
     }
 
     private func noneTransitionOfAnimateTransition(using transitionContext: UIViewControllerContextTransitioning) {
@@ -214,29 +157,16 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
             containerView.addSubview(toView)
             transitionContext.completeTransition(true)
             keyWindow?.insertSubview(fromView, belowSubview: containerView)
-            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, animations: {
+            UIView.animate(withDuration: transitionDuration(using: nil), animations: {
                 toViewController?.view.alpha = 1
             })
         } else if self.dismissed == fromViewController {
-            UIView.animate(withDuration: JoGlleryTransitioning.transitionDuration, animations: {
+            UIView.animate(withDuration: transitionDuration(using: nil), animations: {
                 fromView.alpha = 0
             }, completion: { (completion) in
                 transitionContext.completeTransition(true)
-                self.freeResource()
             })
         }
     }
-    
-    private func freeResource() {
-        parentLocationAttributes = nil
-        dismissLocationAttributes = nil
-        
-        parentTransitionAttributes = nil
-        dismissTransitionAttributes = nil
-        
-        presented = nil
-        presenting = nil
-        dismissed = nil
-    }
-    
+
 }

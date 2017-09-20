@@ -1,5 +1,5 @@
 //
-//  JoGalleryImageView.swift
+//  JoGalleryItemView.swift
 //  JoGallery
 //
 //  Created by django on 5/10/17.
@@ -9,10 +9,11 @@
 import UIKit
 import Photos
 
-public class JoGalleryImageView: UIView {
+public class JoGalleryItemView: UIView {
     
     // MARK: Member variable
     
+    fileprivate (set) var zoomScale: CGFloat
     fileprivate (set) var isRotating: Bool { didSet { if (isRotating) { isTouching = true } } }
     fileprivate (set) var isDragging: Bool { didSet { if (isDragging) { isTouching = true } } }
     fileprivate (set) var isZooming: Bool { didSet { if (isZooming) { isTouching = true } } }
@@ -20,30 +21,21 @@ public class JoGalleryImageView: UIView {
     fileprivate (set) var isTouching: Bool {
         didSet {
             if let delegate = delegate, oldValue == false, isTouching == true {
-                delegate.galleryImageViewBeginTouching(self)
+                delegate.galleryItemViewBeginTouching(self)
             }
         }
     }
-    fileprivate (set) var zoomScale: CGFloat
     
-    open weak var delegate: JoGalleryImageViewDelegate?
-    open let contentView = UIView()
+    public weak var delegate: JoGalleryItemViewDelegate?
+    public let contentView = UIImageView()
+    public let scrollView = UIScrollView()
     
-    private let loadImageQueue = OperationQueue()
+    fileprivate let containView = UIView()
     
-    open var image: UIImage? {
+    fileprivate weak var scrollViewPinchGestureRecognizer: UIPinchGestureRecognizer? {
         didSet {
-            updateImage(image)
-        }
-    }
-    open var asset: PHAsset? {
-        didSet {
-            loadImageQueue.cancelAllOperations()
-            loadImageQueue.addOperation {
-                JoGalleryKit.default.image(self.asset) { (image) in
-                    self.image = image
-                }
-            }
+            removeObserver(oldValue)
+            addObserver(scrollViewPinchGestureRecognizer)
         }
     }
     
@@ -57,14 +49,18 @@ public class JoGalleryImageView: UIView {
         }
     }
     
-    fileprivate let imageView = UIImageView()
-    fileprivate let scrollView = UIScrollView()
-    fileprivate weak var scrollViewPinchGestureRecognizer: UIPinchGestureRecognizer? {
-        didSet {
-            removeObserver(oldValue)
-            addObserver(scrollViewPinchGestureRecognizer)
+    open var maximumBodyOriginZoomScale: CGFloat {
+        get {
+            return 2
         }
     }
+    
+    open var intrinsicBodyOriginSize: CGSize {
+        get {
+            return CGSize.zero
+        }
+    }
+    
     
     // MARK: Life cycle
     
@@ -90,55 +86,82 @@ public class JoGalleryImageView: UIView {
     override public func layoutSubviews() {
         super.layoutSubviews()
         
-        updateImage(image)
+        setNeedsBodyUpdate()
         reSetupFrameRotationForScroll(animation: false)
     }
 }
 
-// MARK: Open
+// MARK: Distribution
 
-extension JoGalleryImageView {
+extension JoGalleryItemView {
     
-    open var imageAttributes: UICollectionViewLayoutAttributes {
+    var currentMotionState: JoGalleryItemMotionStateAttributes {
         get {
-            let attributes = UICollectionViewLayoutAttributes()
-            attributes.size = imageView.frame.size
-            if zoomScale != scrollView.zoomScale {
-                attributes.size.width *= zoomScale
-                attributes.size.height *= zoomScale
-            }
-            let rect = imageView.convert(imageView.bounds, to: self)
-            attributes.center = CGPoint(x: rect.midX, y: rect.midY)
-            attributes.transform = scrollView.transform
-            
-            return attributes
+            return JoGalleryItemMotionStateAttributes(self)
         }
     }
     
-    open class func imageAttributes(_ content: Any) -> UICollectionViewLayoutAttributes? {
-        let attributes = UICollectionViewLayoutAttributes()
-        let range = JoGalleryKit.default.imageSizeRange(content: content)
-        attributes.size = range.defaultSize
-        attributes.center = CGPoint(x: range.contentSize.width / 2, y: range.contentSize.height / 2)
-        return attributes
+    // This should be called whenever the return values for the view content status bar attributes have changed. If it is called from within an animation block, the changes will be animated along with the rest of the animation block.
+    open func setNeedsBodyUpdate() {
+
+        let layout = JoGalleryItemLayoutAttributes(intrinsicBodyOriginSize, maximumBodyOriginZoomScale)
+        
+        scrollView.zoomScale = 1
+        scrollView.minimumZoomScale = layout.minimumZoomScale
+        scrollView.maximumZoomScale = layout.maximumZoomScale
+        scrollView.contentSize = layout.contentSize
+        contentView.bounds.size = layout.bodySizeBoundsSize
+        scrollView.transform = layout.transform
+        
+        adjustContentCenter()
     }
     
+    fileprivate func reSetupFrameRotationForScroll(animation: Bool = false) {
+        if animation {
+            UIView.animate(withDuration: 0.25, animations: {
+                self.reSetupFrameRotationForScroll()
+            })
+        } else {
+            zoomScale = max(scrollView.minimumZoomScale, scrollView.zoomScale)
+            setAnchorPoint(CGPoint(x: 0.5, y: 0.5), for: scrollView)
+            scrollView.transform = CGAffineTransform(a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0)
+            scrollView.frame = bounds
+            adjustContentCenter()
+        }
+    }
+    
+    fileprivate func setAnchorPoint(_ anchorPoint: CGPoint, for view: UIView) {
+        var transition = CGPoint.zero
+        let oldOrigin = view.frame.origin
+        view.layer.anchorPoint = anchorPoint
+        let newOrigin = view.frame.origin
+        transition.x = newOrigin.x - oldOrigin.x
+        transition.y = newOrigin.y - oldOrigin.y
+        view.center = CGPoint(x: view.center.x - transition.x, y: view.center.y - transition.y);
+    }
+    
+    fileprivate func adjustContentCenter() {
+        var center = CGPoint.zero
+        center.x = max(scrollView.contentSize.width, scrollView.bounds.width) / 2
+        center.y = max(scrollView.contentSize.height, scrollView.bounds.height) / 2
+        contentView.center = center
+    }
 }
 
 // MARK: Handle methods
 
-extension JoGalleryImageView: UIGestureRecognizerDelegate {
+extension JoGalleryItemView: UIGestureRecognizerDelegate {
     
     @objc fileprivate func handleDoublePress(_ sender: UITapGestureRecognizer) {
-        guard let view = sender.view, view == imageView else {
+        guard let view = sender.view, view == contentView else {
             return
         }
 
         let zoomScale = scrollView.zoomScale == scrollView.maximumZoomScale ? scrollView.minimumZoomScale : scrollView.maximumZoomScale
         let location = sender.location(in: view)
         var zoomRect = CGRect.zero
-        zoomRect.size.width = imageView.frame.width / zoomScale
-        zoomRect.size.height = imageView.frame.height / zoomScale
+        zoomRect.size.width = contentView.frame.width / zoomScale
+        zoomRect.size.height = contentView.frame.height / zoomScale
         zoomRect.origin.x = location.x - zoomRect.width / 2
         zoomRect.origin.y = location.y - zoomRect.height / 2
         scrollView.zoom(to: zoomRect, animated: true)
@@ -155,13 +178,13 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
         case .began:
             if scrollView.zoomScale <= scrollView.minimumZoomScale,
                 sender.numberOfTouches >= 2,
-                imageView.bounds.contains(sender.location(ofTouch: 0, in: imageView)),
-                imageView.bounds.contains(sender.location(ofTouch: 1, in: imageView)) {
+                contentView.bounds.contains(sender.location(ofTouch: 0, in: contentView)),
+                contentView.bounds.contains(sender.location(ofTouch: 1, in: contentView)) {
                 
-                let location1 = sender.location(ofTouch: 0, in: imageView)
-                let location2 = sender.location(ofTouch: 1, in: imageView)
+                let location1 = sender.location(ofTouch: 0, in: contentView)
+                let location2 = sender.location(ofTouch: 1, in: contentView)
                 let location = CGPoint(x: (location1.x + location2.x) / 2, y: (location1.y + location2.y) / 2)
-                let anchorLocation = imageView.convert(location, to: scrollView)
+                let anchorLocation = contentView.convert(location, to: scrollView)
                 let anchor = CGPoint(x: anchorLocation.x / scrollView.frame.width, y: anchorLocation.y / scrollView.frame.height)
                 setAnchorPoint(anchor, for: scrollView)
                 isRotating = true
@@ -171,7 +194,7 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
             if isRotating {
                 if sender.numberOfTouches >= 2 {
                     scrollView.transform = view.transform.rotated(by: sender.rotation)
-                    adjustImageCenter()
+                    adjustContentCenter()
                 } else {
                     endTouch()
                 }
@@ -197,8 +220,8 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
         case .began:
             if scrollView.zoomScale < scrollView.minimumZoomScale,
                 sender.numberOfTouches >= 2,
-                imageView.bounds.contains(sender.location(ofTouch: 0, in: imageView)),
-                imageView.bounds.contains(sender.location(ofTouch: 1, in: imageView)) {
+                contentView.bounds.contains(sender.location(ofTouch: 0, in: contentView)),
+                contentView.bounds.contains(sender.location(ofTouch: 1, in: contentView)) {
                 
                 isDragging = true
             }
@@ -206,7 +229,7 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
         case .changed:
             if isDragging {
                 if sender.numberOfTouches >= 2 {
-                    let translation = sender.translation(in: contentView)
+                    let translation = sender.translation(in: containView)
                     scrollView.center = CGPoint(x: scrollView.center.x + translation.x, y: scrollView.center.y + translation.y)
                 } else {
                     endTouch()
@@ -219,7 +242,7 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
             }
             break
         }
-        sender.setTranslation(CGPoint.zero, in: contentView)
+        sender.setTranslation(CGPoint.zero, in: containView)
     }
     
     @objc fileprivate func handleScroll(_ sender: UIPanGestureRecognizer) {
@@ -248,7 +271,7 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
             break
         }
         if let delegate = delegate {
-            delegate.galleryImageViewDidScroll(self)
+            delegate.galleryItemViewDidScroll(self)
         }
         sender.setTranslation(CGPoint.zero, in: self)
     }
@@ -258,7 +281,7 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
             return
         }
         if let delegate = delegate {
-            delegate.galleryImageViewDidLongPress(self)
+            delegate.galleryItemViewDidLongPress(self)
         }
     }
     
@@ -267,7 +290,7 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
             return
         }
         if let delegate = delegate {
-            delegate.galleryImageViewDidClick(self)
+            delegate.galleryItemViewDidClick(self)
         }
     }
     
@@ -301,15 +324,16 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
         
         var contains = false
         if scrollView.gestureRecognizers?.contains(gestureRecognizer) ?? false ||
-            imageView.gestureRecognizers?.contains(gestureRecognizer) ?? false ||
-            contentView.gestureRecognizers?.contains(gestureRecognizer) ?? false {
+            contentView.gestureRecognizers?.contains(gestureRecognizer) ?? false ||
+            containView.gestureRecognizers?.contains(gestureRecognizer) ?? false {
             
             contains = true
         }
+        
         var otherContains = false
         if scrollView.gestureRecognizers?.contains(otherGestureRecognizer) ?? false ||
-            imageView.gestureRecognizers?.contains(otherGestureRecognizer) ?? false ||
-            contentView.gestureRecognizers?.contains(otherGestureRecognizer) ?? false {
+            contentView.gestureRecognizers?.contains(otherGestureRecognizer) ?? false ||
+            containView.gestureRecognizers?.contains(otherGestureRecognizer) ?? false {
             
             otherContains = true
         }
@@ -320,7 +344,7 @@ extension JoGalleryImageView: UIGestureRecognizerDelegate {
 
 // MARK: About Observer
 
-extension JoGalleryImageView {
+extension JoGalleryItemView {
     
     fileprivate func addObserver(_ gestureRecognizer: UIGestureRecognizer?) {
         gestureRecognizer?.addObserver(self, forKeyPath: #keyPath(UIGestureRecognizer.state), options: .new, context: nil)
@@ -340,38 +364,10 @@ extension JoGalleryImageView {
         }
     }
 }
-// MARK: Restroe frame
-
-extension JoGalleryImageView {
-    
-    fileprivate func reSetupFrameRotationForScroll(animation: Bool = false) {
-        if animation {
-            UIView.animate(withDuration: 0.25, animations: { 
-                self.reSetupFrameRotationForScroll()
-            })
-        } else {
-            zoomScale = max(scrollView.minimumZoomScale, scrollView.zoomScale)
-            setAnchorPoint(CGPoint(x: 0.5, y: 0.5), for: scrollView)
-            scrollView.transform = CGAffineTransform(a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0)
-            scrollView.frame = bounds
-            adjustImageCenter()
-        }
-    }
-    
-    fileprivate func setAnchorPoint(_ anchorPoint: CGPoint, for view: UIView) {
-        var transition = CGPoint.zero
-        let oldOrigin = view.frame.origin
-        view.layer.anchorPoint = anchorPoint
-        let newOrigin = view.frame.origin
-        transition.x = newOrigin.x - oldOrigin.x
-        transition.y = newOrigin.y - oldOrigin.y
-        view.center = CGPoint(x: view.center.x - transition.x, y: view.center.y - transition.y);
-    }
-}
 
 // MARK: UIScrollViewDelegate
 
-extension JoGalleryImageView: UIScrollViewDelegate {
+extension JoGalleryItemView: UIScrollViewDelegate {
     
     public func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
         if let gestureRecognizers = scrollView.gestureRecognizers {
@@ -388,18 +384,18 @@ extension JoGalleryImageView: UIScrollViewDelegate {
     }
     
     public func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        adjustImageCenter()
+        adjustContentCenter()
         if scrollView.isZooming {
             zoomScale = scrollView.zoomScale
         }
         
         if let delegate = delegate {
-            delegate.galleryImageViewDidZoom(self)
+            delegate.galleryItemViewDidZoom(self)
         }
     }
     
     public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return imageView
+        return contentView
     }
     
     func checkEndTouching(_ finishEnd: () -> Void) {
@@ -412,7 +408,7 @@ extension JoGalleryImageView: UIScrollViewDelegate {
         
         if isZooming || isDragging || isRotating || isScrolling, isTouching {
             if let delegate = delegate {
-                delegate.galleryImageViewWillEndTouch(self)
+                delegate.galleryItemViewWillEndTouch(self)
             }
         }
         
@@ -425,41 +421,13 @@ extension JoGalleryImageView: UIScrollViewDelegate {
             isTouching = false
             reSetupFrameRotationForScroll(animation: true)
             if let delegate = delegate {
-                delegate.galleryImageViewDidEndTouch(self)
+                delegate.galleryItemViewDidEndTouch(self)
             }
         }
     }
 }
 
-// MARK: Init image
-
-extension JoGalleryImageView {
-    
-    fileprivate func updateImage(_ updateImage: UIImage?) {
-        let range = JoGalleryKit.default.imageSizeRange(content: updateImage)
-        scrollView.zoomScale = 1
-        scrollView.minimumZoomScale = 1
-        scrollView.maximumZoomScale = max(range.maximumZoomScale, 2)
-        scrollView.contentSize = range.contentSize
-        imageView.image = updateImage
-        imageView.bounds.size = range.defaultSize
-        adjustImageCenter()
-        
-        scrollView.transform = CGAffineTransform(a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0)
-    }
-    
-    fileprivate func adjustImageCenter() {
-        var center = CGPoint.zero
-        center.x = max(scrollView.contentSize.width, scrollView.bounds.width) / 2
-        center.y = max(scrollView.contentSize.height, scrollView.bounds.height) / 2
-        imageView.center = center
-    }
-    
-}
-
-// MARK: Setup
-
-extension JoGalleryImageView {
+extension JoGalleryItemView {
     
     fileprivate func setup() {
         
@@ -479,26 +447,26 @@ extension JoGalleryImageView {
     private func setupUI() {
         
         clipsToBounds = true
-        setupContentView()
+        setupContainView()
         setupScrollView()
-        setupImageView()
+        setupContentView()
         bindingSubviewsLayout()
         bindingCustomGestureRecognizer()
     }
     
     private func bindingSubviewsLayout() {
         
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint(item: contentView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0).isActive = true
-        NSLayoutConstraint(item: contentView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0).isActive = true
-        NSLayoutConstraint(item: contentView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0).isActive = true
-        NSLayoutConstraint(item: contentView, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
+        containView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint(item: containView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: containView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: containView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: containView, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
         
     }
     
-    private func setupContentView() {
+    private func setupContainView() {
         
-        addSubview(contentView)
+        addSubview(containView)
     }
 
     private func setupScrollView() {
@@ -507,27 +475,27 @@ extension JoGalleryImageView {
         scrollView.clipsToBounds = false
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
-        contentView.addSubview(scrollView)
+        containView.addSubview(scrollView)
     }
     
-    private func setupImageView() {
+    private func setupContentView() {
         
-        imageView.contentMode = .scaleAspectFill
-        scrollView.addSubview(imageView)
+        contentView.contentMode = .scaleAspectFill
+        scrollView.addSubview(contentView)
     }
     
     private func bindingCustomGestureRecognizer() {
         
-        imageView.isUserInteractionEnabled = true
+        contentView.isUserInteractionEnabled = true
         let double = UITapGestureRecognizer(target: self, action: #selector(handleDoublePress(_:)))
         double.delegate = self
         double.numberOfTapsRequired = 2
-        imageView.addGestureRecognizer(double)
+        contentView.addGestureRecognizer(double)
         
         let long = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
         long.delegate = self
         long.minimumPressDuration = 1
-        imageView.addGestureRecognizer(long)
+        contentView.addGestureRecognizer(long)
         
         let rotation = UIRotationGestureRecognizer(target: self, action: #selector(handleRotation(_:)))
         rotation.delegate = self
