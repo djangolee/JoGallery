@@ -48,14 +48,14 @@ extension JoGalleryDelegate {
 
 public protocol JoGalleryControllerAnimatedTransitioning : NSObjectProtocol {
  
-    func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath) -> TimeInterval
+    func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning?, atIndex indexPath: IndexPath?) -> TimeInterval
     
     func animateTransition(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath)
 }
 
 extension JoGalleryControllerAnimatedTransitioning {
     
-    func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath) -> TimeInterval {
+    func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning?, atIndex indexPath: IndexPath?) -> TimeInterval {
         return 0.25
     }
 }

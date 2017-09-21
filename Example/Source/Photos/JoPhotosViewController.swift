@@ -31,14 +31,81 @@ class JoPhotosViewController: UIViewController {
 
 extension JoPhotosViewController: JoGalleryControllerAnimatedTransitioning {
     
-    func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath) -> TimeInterval {
-        return 1
+    func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning?, atIndex indexPath: IndexPath?) -> TimeInterval {
+        return 0.35
     }
     
     func animateTransition(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath) {
+        let asset = assets[indexPath.item]
+        JoPhotosViewController.image(asset, targetSize: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
+            guard let cell = self.collectionView.cellForItem(at: indexPath), let image = image else {
+                return
+            }
+            
+            if transitionContext.direction == .present {
+                self.animateTransitionPresent(using: transitionContext, image: image, loca: cell, atIndex: indexPath)
+                
+            } else if transitionContext.direction == .dismiss {
+                self.animateTransitionDismiss(using: transitionContext, image: image, loca: cell, atIndex: indexPath)
+            }
+        }
+    }
+    
+    func animateTransitionPresent(using transitionContext: JoGalleryControllerContextTransitioning, image: UIImage, loca: UIView, atIndex indexPath: IndexPath) {
+        let imageView = UIImageView(image: image)
+        imageView.frame = loca.convert(loca.bounds, to: transitionContext.containerView)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         
-        transitionContext.completeTransition(true)
+        let backgroupView = UIView()
+        backgroupView.frame = transitionContext.containerView.frame
+        backgroupView.backgroundColor = .black
+        backgroupView.alpha = 0
         
+        transitionContext.containerView.addSubview(backgroupView)
+        transitionContext.containerView.addSubview(imageView)
+        transitionContext.toView.isHidden = true
+        
+        UIView.animate(withDuration: self.transitionDuration(using: nil, atIndex: nil), animations: {
+            imageView.frame.size = transitionContext.attributes.contentSize
+            imageView.center = transitionContext.attributes.contentCenter
+            backgroupView.alpha = transitionContext.attributes.alpha
+        }, completion: { (comletion) in
+            transitionContext.completeTransition(true)
+            transitionContext.toView.isHidden = false
+            backgroupView.removeFromSuperview()
+            imageView.removeFromSuperview()
+        })
+
+    }
+    
+    func animateTransitionDismiss(using transitionContext: JoGalleryControllerContextTransitioning, image: UIImage, loca: UIView, atIndex indexPath: IndexPath) {
+        let imageView = UIImageView(image: image)
+        imageView.frame.size = transitionContext.attributes.contentSize
+        imageView.center = transitionContext.attributes.contentCenter
+        imageView.transform = transitionContext.attributes.transform
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        
+        let backgroupView = UIView()
+        backgroupView.frame = transitionContext.containerView.frame
+        backgroupView.backgroundColor = .black
+        backgroupView.alpha = transitionContext.attributes.alpha
+        
+        transitionContext.containerView.addSubview(backgroupView)
+        transitionContext.containerView.addSubview(imageView)
+        
+        transitionContext.fromView.isHidden = true
+        UIView.animate(withDuration: self.transitionDuration(using: nil, atIndex: nil), animations: {
+            imageView.transform = CGAffineTransform(a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0)
+            imageView.frame = loca.convert(loca.bounds, to: backgroupView)
+            backgroupView.alpha = 0
+        }, completion: { (comletion) in
+            transitionContext.completeTransition(true)
+            transitionContext.fromView.isHidden = false
+            backgroupView.removeFromSuperview()
+            imageView.removeFromSuperview()
+        })
     }
 }
 

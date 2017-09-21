@@ -10,10 +10,23 @@ import UIKit
 
 public struct JoGalleryControllerContextTransitioning {
     
-    var containerView: UIView?
-    var fromView: UIView?
-    var toView: UIView?
-    var attributes: JoGalleryItemMotionStateAttributes?
+    public enum JoGalleryControllerContextTransitioningPushDirection {
+        case present, dismiss
+    }
+    
+    public let containerView: UIView
+    public let fromView: UIView
+    public let toView: UIView
+    public let attributes: JoGalleryItemMotionStateAttributes
+    public let direction: JoGalleryControllerContextTransitioningPushDirection
+    
+    internal init(_ container: UIView, _ frome: UIView, _ to: UIView, _ attributes: JoGalleryItemMotionStateAttributes, _ direction: JoGalleryControllerContextTransitioningPushDirection) {
+        self.containerView = container
+        self.fromView = frome
+        self.toView = to
+        self.attributes = attributes
+        self.direction = direction
+    }
     
     internal var completeTransitionBlackCall: ((_ didComplete: Bool) -> Void)?
     
@@ -56,12 +69,12 @@ internal struct JoGalleryItemLayoutAttributes {
     }
 }
 
-internal struct JoGalleryItemMotionStateAttributes {
+public struct JoGalleryItemMotionStateAttributes {
 
-    let contentSize: CGSize
-    let contentCenter: CGPoint
-    let transform: CGAffineTransform
-    var alpha: CGFloat
+    public let contentSize: CGSize
+    public let contentCenter: CGPoint
+    public let transform: CGAffineTransform
+    public var alpha: CGFloat
     
     init(_ item: JoGalleryItemView) {
         

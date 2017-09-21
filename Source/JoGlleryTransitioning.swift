@@ -15,7 +15,6 @@ class JoGlleryTransitioning: NSObject {
     
     var animateIndexPath: IndexPath?
     var animateAttributes: JoGalleryItemMotionStateAttributes?
-    var context = JoGalleryControllerContextTransitioning()
     
     fileprivate weak var presented: UIViewController?
     fileprivate weak var presenting: UIViewController?
@@ -51,7 +50,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         if let delegate = transitioningDelegate, let indexpath = animateIndexPath {
-            return delegate.transitionDuration(using: context, atIndex: indexpath)
+            return delegate.transitionDuration(using: nil, atIndex: indexpath)
         } else {
             return 0.25
         }
@@ -88,27 +87,24 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
                 noneTransitionOfAnimateTransition(using: transitionContext)
                 return
         }
+        
         let containerView = transitionContext.containerView
-    
+        
+        let contextView = UIView()
+        contextView.frame = containerView.frame
+        containerView.addSubview(contextView)
+        var context = JoGalleryControllerContextTransitioning(contextView, fromView, toView, attributes, .present)
         context.completeTransitionBlackCall = { (didComplete) in
-            self.context.completeTransitionBlackCall = nil
-            if didComplete {
-                toView.isHidden = false
-            }
+            context.completeTransitionBlackCall = nil
+            context.containerView.removeFromSuperview()
+            toView.isHidden = false
         }
         
-        toView.isHidden = true
-        context.toView = toView
-        context.fromView = fromView
-        context.attributes = attributes
-        context.containerView = UIView()
-        context.containerView?.frame = containerView.frame
-        containerView.addSubview(context.containerView!)
-        
-        containerView.addSubview(toView)
+        containerView.insertSubview(toView, belowSubview: contextView)
         transitionContext.completeTransition(true)
         keyWindow.insertSubview(fromView, belowSubview: containerView)
         
+        toView.isHidden = true
         delegate.animateTransition(using: context, atIndex: indexPath)
     }
     
@@ -125,18 +121,17 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         }
         let containerView = transitionContext.containerView
         
+        let contextView = UIView()
+        contextView.frame = containerView.frame
+        containerView.addSubview(contextView)
+        
+        var context = JoGalleryControllerContextTransitioning(contextView, fromView, toView, attributes, .dismiss)
         context.completeTransitionBlackCall = { (didComplete) in
-            self.context.completeTransitionBlackCall = nil
-            transitionContext.completeTransition(true)
+            context.completeTransitionBlackCall = nil
+            context.containerView.removeFromSuperview()
+            transitionContext.completeTransition(didComplete)
         }
-        
-        context.toView = toView
-        context.fromView = fromView
-        context.attributes = attributes
-        context.containerView = UIView()
-        context.containerView?.frame = containerView.frame
-        containerView.addSubview(context.containerView!)
-        
+    
         delegate.animateTransition(using: context, atIndex: indexPath)
     }
 
