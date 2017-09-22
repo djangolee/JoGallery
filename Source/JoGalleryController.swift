@@ -66,6 +66,10 @@ open class JoGalleryController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     // MARK: Self.view life cycle
     
     override open func viewDidLoad() {
@@ -83,16 +87,10 @@ open class JoGalleryController: UIViewController {
         adjustScrollToItem(to: currentIndexPath)
     }
     
-    override open var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
-        return .slide
-    }
+    // MARK: Notification
     
-    override open var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
-    }
-    
-    override open var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-        return .portrait
+    @objc func statusBarOrientationChange(_ notification: Notification) {
+        
     }
 }
 
@@ -256,9 +254,7 @@ extension JoGalleryController: UICollectionViewDelegateFlowLayout, UICollectionV
     func adjustScrollToItem(to indexPath: IndexPath) {
         
         if let frame = collectionView.collectionViewLayout.layoutAttributesForItem(at: indexPath)?.frame,
-            let visibleIndexPath = currentIndexPathsForFullVisible(),
-            indexPath != visibleIndexPath, !frame.equalTo(CGRect.zero) {
-            
+            let _ = currentIndexPathsForFullVisible(), !frame.equalTo(CGRect.zero) {
             collectionView.contentOffset = frame.origin
         }
     }
@@ -292,7 +288,7 @@ extension JoGalleryController {
     }
     
     private func prepareLaunch() {
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(statusBarOrientationChange(_:)), name: NSNotification.Name.UIApplicationDidChangeStatusBarOrientation, object: nil)
     }
     
     private func setupUI() {
@@ -303,21 +299,17 @@ extension JoGalleryController {
     }
     
     private func bindingSubviewsLayout() {
-        _ = {
-            self.backgroundView.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint(item: self.backgroundView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1, constant: 0).isActive = true
-            NSLayoutConstraint(item: self.backgroundView, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .leading, multiplier: 1, constant: 0).isActive = true
-            NSLayoutConstraint(item: self.backgroundView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1, constant: 0).isActive = true
-            NSLayoutConstraint(item: self.backgroundView, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
-        }()
-        
-        _ = {
-            self.collectionView.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint(item: self.collectionView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1, constant: 0).isActive = true
-            NSLayoutConstraint(item: self.collectionView, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .leading, multiplier: 1, constant: 0).isActive = true
-            NSLayoutConstraint(item: self.collectionView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1, constant: 0).isActive = true
-            NSLayoutConstraint(item: self.collectionView, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
-        }()
+        self.backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint(item: self.backgroundView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: self.backgroundView, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .leading, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: self.backgroundView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: self.backgroundView, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
+
+        self.collectionView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint(item: self.collectionView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: self.collectionView, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .leading, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: self.collectionView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1, constant: 0).isActive = true
+        NSLayoutConstraint(item: self.collectionView, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: 0).isActive = true
     }
     
     private func setupBackgroundView() {

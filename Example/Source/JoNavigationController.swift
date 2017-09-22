@@ -20,13 +20,5 @@ class JoNavigationController: UINavigationController {
         super.didReceiveMemoryWarning()
     }
     
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
-    }
-    
-    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-        return .portrait
-    }
-    
 }
 
