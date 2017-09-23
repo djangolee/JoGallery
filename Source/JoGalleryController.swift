@@ -161,8 +161,6 @@ extension JoGalleryController: JoGalleryItemViewDelegate {
     public func galleryItemViewWillEndTouch(_ galleryItemView: JoGalleryItemView) {
         if backgroundView.alpha <= 0 {
             prepareDismiss(galleryItemView, animated: true)
-        } else {
-            delegate?.galleryDidEndTransforming(in: self, atIndex: currentIndexPath, with: backgroundView.alpha)
         }
     }
     
@@ -192,15 +190,18 @@ extension JoGalleryController: JoGalleryItemViewDelegate {
             } else {
                 scrollScale = (closeScrollThresholdValue - fabs(galleryItemView.offset.y)) / closeScrollThresholdValue
             }
+            delegate?.galleryDidTransforming(in: self, atIndex: currentIndexPath, isTouching: galleryItemView.isTouching, with: backgroundView.alpha)
         }
         
         if self.backgroundView.alpha != min(zoomScale, scrollScale) {
             UIView.animate(withDuration: 0.25, animations: {
                 self.backgroundView.alpha = min(zoomScale, scrollScale)
+            }, completion: { (completion) in
+                if self.backgroundView.alpha > 0 && didEnd {
+                    self.delegate?.galleryDidEndTransforming(in: self, atIndex: self.currentIndexPath, with: self.backgroundView.alpha)
+                }
             })
         }
-        
-        delegate?.galleryDidTransforming(in: self, atIndex: currentIndexPath, isTouching: galleryItemView.isTouching, with: backgroundView.alpha)
     }
 }
 
@@ -214,7 +215,7 @@ extension JoGalleryController: UICollectionViewDelegateFlowLayout, UICollectionV
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let dataSource = dataSource {
-            return dataSource.galleryController(self, numberOfItemsInSection: section)
+            return dataSource.gallery(self, numberOfItemsInSection: section)
         } else {
             return 0
         }
@@ -229,7 +230,7 @@ extension JoGalleryController: UICollectionViewDelegateFlowLayout, UICollectionV
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = dataSource!.galleryController(self, cellForItemAt: indexPath)
+        let cell = dataSource!.gallery(self, cellForItemAt: indexPath)
         cell.minimumLineSpacing = minimumLineSpacing
         cell.containView.delegate = self
         cell.update(maxZoomScale: maximumBodyOriginZoomScale, originSize: delegate?.gallery(self, cellSizeForItemAt: indexPath) ?? CGSize.zero)

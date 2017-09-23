@@ -31,6 +31,10 @@ class JoPhotosViewController: UIViewController {
 
 extension JoPhotosViewController: JoGalleryControllerAnimatedTransitioning {
     
+    func animationEnded(_ transitionCompleted: Bool, atIndex indexPath: IndexPath) {
+        
+    }
+    
     func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning?, atIndex indexPath: IndexPath?) -> TimeInterval {
         return 0.35
     }
@@ -114,15 +118,31 @@ extension JoPhotosViewController: JoGalleryDelegate {
     func gallery(_ galleryController: JoGalleryController, cellSizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: assets[indexPath.item].pixelWidth, height: assets[indexPath.item].pixelHeight)
     }
+    
+    func gallery(_ galleryController: JoGalleryController, scrolDidDisplay cell: JoGalleryCell, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath) {
+        print("\(indexPath.item) \(oldIndexPath.item)")
+    }
+    
+    func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath) {
+        collectionView.cellForItem(at: indexPath)?.isHidden = true
+    }
+    
+    func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat) {
+        print(#function)
+    }
+    
+    func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat) {
+        collectionView.cellForItem(at: indexPath)?.isHidden = false
+    }
 }
 
 extension JoPhotosViewController: JoGalleryDataSource {
     
-    func galleryController(_ galleryController: JoGalleryController, numberOfItemsInSection section: Int) -> Int {
+    func gallery(_ galleryController: JoGalleryController, numberOfItemsInSection section: Int) -> Int {
         return assets.count
     }
     
-    func galleryController(_ galleryController: JoGalleryController, cellForItemAt indexPath: IndexPath) -> JoGalleryCell {
+    func gallery(_ galleryController: JoGalleryController, cellForItemAt indexPath: IndexPath) -> JoGalleryCell {
         let cell = galleryController.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(JoGalleryCell.self), for: indexPath)
         
         let asset = assets[indexPath.item]

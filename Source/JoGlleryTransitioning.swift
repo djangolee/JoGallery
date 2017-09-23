@@ -98,6 +98,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
             context.completeTransitionBlackCall = nil
             context.containerView.removeFromSuperview()
             toView.isHidden = false
+            delegate.animationEnded(didComplete, atIndex: indexPath)
         }
         
         containerView.insertSubview(toView, belowSubview: contextView)
@@ -130,6 +131,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
             context.completeTransitionBlackCall = nil
             context.containerView.removeFromSuperview()
             transitionContext.completeTransition(didComplete)
+            delegate.animationEnded(didComplete, atIndex: indexPath)
         }
     
         delegate.animateTransition(using: context, atIndex: indexPath)

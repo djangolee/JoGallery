@@ -14,8 +14,8 @@ public protocol JoGalleryDataSource: NSObjectProtocol {
     
     func numberOfSections(in galleryController: JoGalleryController) -> Int
     
-    func galleryController(_ galleryController: JoGalleryController, numberOfItemsInSection section: Int) -> Int
-    func galleryController(_ galleryController: JoGalleryController, cellForItemAt indexPath: IndexPath) -> JoGalleryCell
+    func gallery(_ galleryController: JoGalleryController, numberOfItemsInSection section: Int) -> Int
+    func gallery(_ galleryController: JoGalleryController, cellForItemAt indexPath: IndexPath) -> JoGalleryCell
 }
 
 extension JoGalleryDataSource {
@@ -27,8 +27,9 @@ extension JoGalleryDataSource {
 public protocol JoGalleryDelegate: NSObjectProtocol {
     
     func gallery(_ galleryController: JoGalleryController, cellSizeForItemAt indexPath: IndexPath) -> CGSize
+    
     func gallery(_ galleryController: JoGalleryController, scrolDidDisplay cell: JoGalleryCell, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath)
-
+    
     func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath)
     func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat)
     func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat)
@@ -51,12 +52,18 @@ public protocol JoGalleryControllerAnimatedTransitioning : NSObjectProtocol {
     func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning?, atIndex indexPath: IndexPath?) -> TimeInterval
     
     func animateTransition(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath)
+    
+    func animationEnded(_ transitionCompleted: Bool, atIndex indexPath: IndexPath)
 }
 
 extension JoGalleryControllerAnimatedTransitioning {
     
     func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning?, atIndex indexPath: IndexPath?) -> TimeInterval {
         return 0.25
+    }
+    
+    func animationEnded(_ transitionCompleted: Bool, atIndex indexPath: IndexPath) {
+        
     }
 }
 
