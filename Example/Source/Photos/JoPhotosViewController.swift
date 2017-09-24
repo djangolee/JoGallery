@@ -32,7 +32,7 @@ class JoPhotosViewController: UIViewController {
 extension JoPhotosViewController: JoGalleryControllerAnimatedTransitioning {
     
     func animationEnded(_ transitionCompleted: Bool, atIndex indexPath: IndexPath) {
-        
+        collectionView.cellForItem(at: indexPath)?.isHidden = false
     }
     
     func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning?, atIndex indexPath: IndexPath?) -> TimeInterval {
@@ -125,10 +125,6 @@ extension JoPhotosViewController: JoGalleryDelegate {
     
     func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath) {
         collectionView.cellForItem(at: indexPath)?.isHidden = true
-    }
-    
-    func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat) {
-        print(#function)
     }
     
     func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat) {
