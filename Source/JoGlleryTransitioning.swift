@@ -89,23 +89,21 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         }
         
         let containerView = transitionContext.containerView
-        
         let contextView = UIView()
         contextView.frame = containerView.frame
+        contextView.autoresizingMask = [.flexibleWidth, .flexibleHeight, .flexibleRightMargin, .flexibleBottomMargin]
         containerView.addSubview(contextView)
+        
         var context = JoGalleryControllerContextTransitioning(contextView, fromView, toView, attributes, .present)
         context.completeTransitionBlackCall = { (didComplete) in
             context.completeTransitionBlackCall = nil
             context.containerView.removeFromSuperview()
-            toView.isHidden = false
+            containerView.insertSubview(toView, belowSubview: contextView)
+            transitionContext.completeTransition(didComplete)
+            keyWindow.insertSubview(fromView, belowSubview: containerView)
+            
             delegate.animationEnded(didComplete, atIndex: indexPath)
         }
-        
-        containerView.insertSubview(toView, belowSubview: contextView)
-        transitionContext.completeTransition(true)
-        keyWindow.insertSubview(fromView, belowSubview: containerView)
-        
-        toView.isHidden = true
         delegate.animateTransition(using: context, atIndex: indexPath)
     }
     
@@ -124,14 +122,15 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         
         let contextView = UIView()
         contextView.frame = containerView.frame
+        contextView.autoresizingMask = [.flexibleWidth, .flexibleHeight, .flexibleRightMargin, .flexibleBottomMargin]
         containerView.addSubview(contextView)
         
         var context = JoGalleryControllerContextTransitioning(contextView, fromView, toView, attributes, .dismiss)
         context.completeTransitionBlackCall = { (didComplete) in
             context.completeTransitionBlackCall = nil
+            
             context.containerView.removeFromSuperview()
             transitionContext.completeTransition(didComplete)
-            delegate.animationEnded(didComplete, atIndex: indexPath)
         }
     
         delegate.animateTransition(using: context, atIndex: indexPath)
