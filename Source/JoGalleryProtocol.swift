@@ -53,17 +53,12 @@ public protocol JoGalleryControllerAnimatedTransitioning : NSObjectProtocol {
     
     func animateTransition(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath)
     
-    func animationEnded(_ transitionCompleted: Bool, atIndex indexPath: IndexPath)
 }
 
 extension JoGalleryControllerAnimatedTransitioning {
     
     func transitionDuration(using transitionContext: JoGalleryControllerContextTransitioning?, atIndex indexPath: IndexPath?) -> TimeInterval {
         return 0.25
-    }
-    
-    func animationEnded(_ transitionCompleted: Bool, atIndex indexPath: IndexPath) {
-        
     }
 }
 

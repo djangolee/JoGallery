@@ -101,8 +101,6 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
             containerView.insertSubview(toView, belowSubview: contextView)
             transitionContext.completeTransition(didComplete)
             keyWindow.insertSubview(fromView, belowSubview: containerView)
-            
-            delegate.animationEnded(didComplete, atIndex: indexPath)
         }
         delegate.animateTransition(using: context, atIndex: indexPath)
     }
