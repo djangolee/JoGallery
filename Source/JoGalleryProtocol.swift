@@ -28,7 +28,7 @@ public protocol JoGalleryDelegate: NSObjectProtocol {
     
     func gallery(_ galleryController: JoGalleryController, cellSizeForItemAt indexPath: IndexPath) -> CGSize
     
-    func gallery(_ galleryController: JoGalleryController, scrolDidDisplay cell: JoGalleryCell, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath)
+    func galleryScrolDidDisplay(in galleryController: JoGalleryController, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath)
     
     func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath)
     func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat)
@@ -38,7 +38,7 @@ public protocol JoGalleryDelegate: NSObjectProtocol {
 
 extension JoGalleryDelegate {
     
-    public func gallery(_ galleryController: JoGalleryController, scrolDidDisplay cell: JoGalleryCell, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath) { }
+    public func galleryScrolDidDisplay(in galleryController: JoGalleryController, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath) { }
     
     public func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath) { }
     public func galleryDidTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, isTouching : Bool, with thresholdValue: CGFloat) { }

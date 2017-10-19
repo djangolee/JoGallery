@@ -109,14 +109,16 @@ extension JoGalleryController {
         return collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath) as! JoGalleryCell
     }
     
+    open func cellForItem(at indexPath: IndexPath) -> JoGalleryCell? {
+        return collectionView.cellForItem(at: indexPath) as? JoGalleryCell
+    }
+    
     open func reloadData() {
         collectionView.reloadData()
     }
     
     open func present(from viewControllerFromParent: UIViewController, toItem: IndexPath, completion: (() -> Swift.Void)? = nil) {
-        _currentIndexPath = toItem
-        adjustScrollToItem(to: toItem)
-        
+        currentIndexPath = toItem
         if let delegate = delegate {
             let attributes = JoGalleryItemMotionStateAttributes(delegate.gallery(self, cellSizeForItemAt: toItem))
             transitioning.animationIndexPath(indexPath: toItem, attributes: attributes);
@@ -246,9 +248,7 @@ extension JoGalleryController: UICollectionViewDelegateFlowLayout, UICollectionV
             let oldItem = _currentIndexPath
             _currentIndexPath = indexPath
             
-            if let delegate = delegate, let cell = collectionView.cellForItem(at: currentIndexPath) as? JoGalleryCell {
-                delegate.gallery(self, scrolDidDisplay: cell, forItemAt: currentIndexPath, oldItemFrom: oldItem)
-            }
+            delegate?.galleryScrolDidDisplay(in: self, forItemAt: currentIndexPath, oldItemFrom: oldItem)
         }
     }
     
