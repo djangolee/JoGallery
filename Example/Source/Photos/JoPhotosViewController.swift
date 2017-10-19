@@ -41,6 +41,7 @@ extension JoPhotosViewController: JoGalleryControllerAnimatedTransitioning {
     
     func animateTransition(using transitionContext: JoGalleryControllerContextTransitioning, atIndex indexPath: IndexPath) {
         let asset = assets[indexPath.item]
+        
         JoPhotosViewController.image(asset, targetSize: CGSize(width: asset.pixelWidth, height: asset.pixelHeight)) { (image) in
             guard let cell = self.collectionView.cellForItem(at: indexPath), let image = image else {
                 return
@@ -56,6 +57,7 @@ extension JoPhotosViewController: JoGalleryControllerAnimatedTransitioning {
     }
     
     func animateTransitionPresent(using transitionContext: JoGalleryControllerContextTransitioning, image: UIImage, loca: UIView, atIndex indexPath: IndexPath) {
+        
         let imageView = UIImageView(image: image)
         imageView.frame = loca.convert(loca.bounds, to: transitionContext.containerView)
         imageView.contentMode = .scaleAspectFill
@@ -66,16 +68,18 @@ extension JoPhotosViewController: JoGalleryControllerAnimatedTransitioning {
         backgroupView.backgroundColor = .black
         backgroupView.alpha = 0
         
+        transitionContext.toView.isHidden = true
         transitionContext.containerView.addSubview(backgroupView)
         transitionContext.containerView.addSubview(imageView)
-        transitionContext.toView.isHidden = true
+        
+        transitionContext.completeTransition(true)
         
         UIView.animate(withDuration: self.transitionDuration(using: nil, atIndex: nil), animations: {
             imageView.frame.size = transitionContext.attributes.contentSize
             imageView.center = transitionContext.attributes.contentCenter
             backgroupView.alpha = transitionContext.attributes.alpha
         }, completion: { (comletion) in
-            transitionContext.completeTransition(true)
+            self.collectionView.cellForItem(at: indexPath)?.isHidden = false
             transitionContext.toView.isHidden = false
             backgroupView.removeFromSuperview()
             imageView.removeFromSuperview()
@@ -84,6 +88,8 @@ extension JoPhotosViewController: JoGalleryControllerAnimatedTransitioning {
     }
     
     func animateTransitionDismiss(using transitionContext: JoGalleryControllerContextTransitioning, image: UIImage, loca: UIView, atIndex indexPath: IndexPath) {
+        collectionView.cellForItem(at: indexPath)?.isHidden = true
+        
         let imageView = UIImageView(image: image)
         imageView.frame.size = transitionContext.attributes.contentSize
         imageView.center = transitionContext.attributes.contentCenter
@@ -105,6 +111,7 @@ extension JoPhotosViewController: JoGalleryControllerAnimatedTransitioning {
             imageView.frame = loca.convert(loca.bounds, to: backgroupView)
             backgroupView.alpha = 0
         }, completion: { (comletion) in
+            self.collectionView.cellForItem(at: indexPath)?.isHidden = true
             transitionContext.completeTransition(true)
             transitionContext.fromView.isHidden = false
             backgroupView.removeFromSuperview()
@@ -121,6 +128,8 @@ extension JoPhotosViewController: JoGalleryDelegate {
     
     func gallery(_ galleryController: JoGalleryController, scrolDidDisplay cell: JoGalleryCell, forItemAt indexPath: IndexPath, oldItemFrom oldIndexPath: IndexPath) {
         print("\(indexPath.item) \(oldIndexPath.item)")
+        collectionView.cellForItem(at: indexPath)?.isHidden = true
+        collectionView.cellForItem(at: oldIndexPath)?.isHidden = false
     }
     
     func galleryBeginTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath) {
@@ -128,7 +137,7 @@ extension JoPhotosViewController: JoGalleryDelegate {
     }
     
     func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat) {
-        collectionView.cellForItem(at: indexPath)?.isHidden = false
+
     }
 }
 

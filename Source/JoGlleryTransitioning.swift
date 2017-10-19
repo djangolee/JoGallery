@@ -89,16 +89,11 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         }
         
         let containerView = transitionContext.containerView
-        let contextView = UIView()
-        contextView.frame = containerView.frame
-        contextView.autoresizingMask = [.flexibleWidth, .flexibleHeight, .flexibleRightMargin, .flexibleBottomMargin]
-        containerView.addSubview(contextView)
         
-        var context = JoGalleryControllerContextTransitioning(contextView, fromView, toView, attributes, .present)
+        var context = JoGalleryControllerContextTransitioning(containerView, fromView, toView, attributes, .present)
         context.completeTransitionBlackCall = { (didComplete) in
             context.completeTransitionBlackCall = nil
-            context.containerView.removeFromSuperview()
-            containerView.insertSubview(toView, belowSubview: contextView)
+            containerView.insertSubview(toView, belowSubview: containerView)
             transitionContext.completeTransition(didComplete)
             keyWindow.insertSubview(fromView, belowSubview: containerView)
         }
@@ -118,19 +113,11 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         }
         let containerView = transitionContext.containerView
         
-        let contextView = UIView()
-        contextView.frame = containerView.frame
-        contextView.autoresizingMask = [.flexibleWidth, .flexibleHeight, .flexibleRightMargin, .flexibleBottomMargin]
-        containerView.addSubview(contextView)
-        
-        var context = JoGalleryControllerContextTransitioning(contextView, fromView, toView, attributes, .dismiss)
+        var context = JoGalleryControllerContextTransitioning(containerView, fromView, toView, attributes, .dismiss)
         context.completeTransitionBlackCall = { (didComplete) in
             context.completeTransitionBlackCall = nil
-            
-            context.containerView.removeFromSuperview()
             transitionContext.completeTransition(didComplete)
         }
-    
         delegate.animateTransition(using: context, atIndex: indexPath)
     }
 
