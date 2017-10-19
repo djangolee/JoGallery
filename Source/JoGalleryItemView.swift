@@ -513,11 +513,10 @@ extension JoGalleryItemView {
         scroll.maximumNumberOfTouches = 1
         addGestureRecognizer(scroll)
 
-        let single = UITapGestureRecognizer(target: self, action: #selector(handleSinglePress(_:)))
-        single.delegate = self
-        single.numberOfTapsRequired = 1
-        addGestureRecognizer(single)
-        
-        single.require(toFail: double)
+//        let single = UITapGestureRecognizer(target: self, action: #selector(handleSinglePress(_:)))
+//        single.delegate = self
+//        single.numberOfTapsRequired = 1
+//        addGestureRecognizer(single)
+//        single.require(toFail: double)
     }
 }
