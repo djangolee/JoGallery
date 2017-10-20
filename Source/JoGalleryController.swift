@@ -137,7 +137,6 @@ extension JoGalleryController {
         
         dismiss(animated: flag, completion: completion)
     }
-    
 }
 
 // MARK: JoGalleryItemViewDelegate

@@ -138,7 +138,8 @@ extension JoPhotosViewController: JoGalleryDelegate {
     }
     
     func galleryDidEndTransforming(in galleryController: JoGalleryController, atIndex indexPath: IndexPath, with thresholdValue: CGFloat) {
-
+        collectionView.cellForItem(at: indexPath)?.isHidden = false
+        galleryController.dismiss(animated: true, completion: nil)
     }
 }
 

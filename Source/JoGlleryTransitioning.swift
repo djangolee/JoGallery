@@ -63,6 +63,8 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
             let fromViewController = transitionContext.viewController(forKey: .from) else {
                 
                 transitionContext.completeTransition(true)
+                animateIndexPath = nil
+                animateAttributes = nil
                 return
         }
         
@@ -73,6 +75,8 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
         } else {
             noneTransitionOfAnimateTransition(using: transitionContext)
         }
+        animateIndexPath = nil
+        animateAttributes = nil
     }
     
     private func presentOfAnimateTransition(using transitionContext: UIViewControllerContextTransitioning, fromVC: UIViewController, toVC: UIViewController) {
@@ -142,6 +146,7 @@ extension JoGlleryTransitioning: UIViewControllerTransitioningDelegate, UIViewCo
                 toViewController?.view.alpha = 1
             })
         } else if self.dismissed == fromViewController {
+            
             UIView.animate(withDuration: transitionDuration(using: nil), animations: {
                 fromView.alpha = 0
             }, completion: { (completion) in
